@@ -12,12 +12,6 @@
   port = 3000
   publish = "dist"
 
-# Configure Angular runtime plugin to skip SSR
-[[plugins]]
-package = "@netlify/angular-runtime"
-[plugins.inputs]
-skipSSR = true
-
 # Redirect all routes to index.html for client-side routing
 [[redirects]]
   from = "/*"
