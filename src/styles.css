@@ -1,0 +1,228 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-app-bg: var(--bg);
+  --color-app-surface: var(--surface);
+  --color-app-ink: var(--ink);
+  --color-app-line: var(--line);
+  --color-app-accent: var(--accent);
+  --color-app-highlight: var(--highlight);
+  --color-app-error: #ef4444;
+  --color-app-success: #10b981;
+}
+
+:root {
+  /* Classic Theme */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --line: #f1f5f9;
+  --accent: #2563eb;
+  --highlight: #eff6ff;
+}
+
+[data-theme='dark'] {
+  --bg: #020617;
+  --surface: #0f172a;
+  --ink: #f8fafc;
+  --line: #1e293b;
+  --accent: #60a5fa;
+  --highlight: #1e293b;
+}
+
+[data-theme='ocean'] {
+  --bg: #082f49;
+  --surface: #0c4a6e;
+  --ink: #f0f9ff;
+  --line: #075985;
+  --accent: #38bdf8;
+  --highlight: #075985;
+}
+
+[data-theme='sepia'] {
+  --bg: #f5f2ed;
+  --surface: #fffcf8;
+  --ink: #433422;
+  --line: #e3dcd2;
+  --accent: #92400e;
+  --highlight: #fef3c7;
+}
+
+body {
+  @apply bg-app-bg text-app-ink font-sans transition-colors duration-300;
+}
+
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  border: 2px solid #1e293b;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  background-color: var(--surface);
+}
+
+@media (min-width: 1024px) {
+  .sudoku-grid {
+    max-width: 700px;
+  }
+}
+
+.sudoku-cell {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  transition: all 0.2s ease;
+  background-color: var(--surface);
+  color: #1e40af;
+}
+
+@media (min-width: 1024px) {
+  .sudoku-cell {
+    font-size: 3rem;
+  }
+}
+
+.sudoku-cell:nth-child(9n) {
+  border-right: none;
+}
+
+.sudoku-cell:nth-child(n+73) {
+  border-bottom: none;
+}
+
+/* 3x3 Block Borders - Thicker and Darker */
+.sudoku-cell:nth-child(3n):not(:nth-child(9n)) {
+  border-right: 2px solid #1e293b;
+}
+
+.sudoku-cell:nth-child(n+19):nth-child(-n+27),
+.sudoku-cell:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid #1e293b;
+}
+
+.sudoku-cell.selected {
+  background-color: var(--accent) !important;
+  color: white !important;
+  z-index: 20;
+}
+
+.sudoku-cell.highlighted {
+  background-color: color-mix(in srgb, var(--accent), transparent 90%);
+}
+
+.sudoku-cell.same-number {
+  background-color: color-mix(in srgb, var(--accent), transparent 75%);
+  font-weight: bold;
+}
+
+.sudoku-cell.box-complete {
+  background-color: #f0fdf4; /* Very subtle green */
+}
+
+.sudoku-cell.hint-target {
+  background-color: #22c55e !important; /* Green for hint cell */
+  color: white !important;
+  z-index: 30;
+}
+
+.sudoku-cell.hint-conflict {
+  background-color: #fee2e2 !important; /* Red for conflicts */
+  color: #ef4444 !important;
+}
+
+[data-theme='dark'] .sudoku-cell.box-complete {
+  background-color: #064e3b;
+}
+
+.sudoku-cell.error {
+  color: #ef4444 !important;
+  background-color: #fef2f2;
+}
+
+.sudoku-cell.initial {
+  font-weight: 700;
+  color: #0f172a; /* Bold black for initial numbers */
+}
+
+[data-theme='dark'] .sudoku-cell.initial {
+  color: #f8fafc;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+}
+
+.note-digit {
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+
+@media (min-width: 1024px) {
+  .note-digit {
+    font-size: 0.875rem;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-in {
+  animation-duration: 300ms;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.zoom-in {
+  animation-name: zoomIn;
+}
+
+.action-btn-circle {
+  @apply w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-all active:scale-90 disabled:opacity-30 shadow-sm;
+}
+
+.action-btn-circle.active {
+  @apply bg-blue-600 text-white shadow-lg shadow-blue-600/20;
+}
+
+.numpad-btn {
+  @apply aspect-square flex items-center justify-center text-4xl font-mono font-medium bg-app-surface border border-app-line rounded-2xl hover:bg-app-accent hover:text-white transition-all active:scale-90 disabled:opacity-30 shadow-sm;
+  color: #1e40af; /* Blueish numbers like in the image */
+}
+
+.numpad-btn.complete {
+  @apply bg-app-success/10 text-app-success border-app-success/20 hover:bg-app-success hover:text-white;
+}
+
+[data-theme='dark'] .numpad-btn {
+  color: #60a5fa;
+}
