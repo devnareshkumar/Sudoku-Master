@@ -1,14 +1,21 @@
 # Netlify configuration for Sudoku Master Edition
-# Deploying as static SPA with client-side routing
+# Deploying as static SPA with client-side routing (no SSR on Netlify)
 
 [build]
   command = "npm run build"
   publish = "dist/app/browser"
+  # Do not use Node functions (SSR not needed for static SPA)
+  functions = ""
 
 [dev]
   command = "npm run dev"
   port = 3000
   publish = "dist"
+
+# Tell Angular runtime plugin to skip SSR since we're on static hosting
+[plugins."@netlify/angular-runtime".inputs]
+  # This disables SSR edge function creation
+  skipSSR = true
 
 # Redirect all routes to index.html for client-side routing
 [[redirects]]
