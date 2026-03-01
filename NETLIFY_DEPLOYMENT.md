@@ -1,25 +1,62 @@
 # Netlify Deployment Guide
 
-## ⚠️ CRITICAL: Disable Angular Runtime Plugin
+## ⚠️ Fix for Angular Runtime Plugin Error
 
-The build is failing because Netlify's `@netlify/angular-runtime` plugin is automatically trying to create SSR edge functions, but we're deploying as a static SPA.
+Netlify automatically installs the `@netlify/angular-runtime` plugin which tries to create SSR edge functions. We've implemented a fix for this.
 
-### Fix: Disable the Plugin in Netlify Dashboard
+### Automatic Fix (Now Included)
+
+A post-build script (`scripts/fix-netlify-build.js`) is now included that:
+- ✅ Generates missing Angular SSR files that Netlify expects
+- ✅ Prevents the "render-utils.server.mjs not found" error
+- ✅ Allows static SPA deployment without SSR
+- ✅ Runs automatically with `npm run build`
+
+**The fix is already in place!** Just push your code and redeploy.
+
+### Manual Fix (Optional but Recommended)
+
+For a cleaner solution, disable the plugin in Netlify Dashboard:
 
 1. **Go to your Netlify project dashboard**
 2. **Navigate to Site Settings** → **Build & Deploy** → **Plugins**
-3. **Find and REMOVE/DISABLE** the plugin named: `@netlify/angular-runtime`
+3. **Find and REMOVE/DISABLE**: `@netlify/angular-runtime`
 4. **Save changes**
-5. **Trigger a new deploy** (push to GitHub or click "Deploy site")
-
-That's it! The build will now succeed.
+5. **Trigger a new deploy** (push to GitHub or click "Trigger deploy")
 
 ## Why This Happens
 
 - Netlify auto-detects Angular projects and tries to set up SSR
 - We're deploying as a static SPA (client-side routing only)
 - The plugin tries to create edge functions that reference server files that don't exist in the static build
-- Removing the plugin tells Netlify to just serve the static files as-is
+- The automatic fix creates the missing files so the build succeeds anyway
+
+## What the Automatic Fix Does
+
+The `scripts/fix-netlify-build.js` script runs after every build and:
+1. Checks if SSR files exist
+2. Creates placeholder files for missing Angular rendering utilities
+3. Allows the edge function bundler to succeed
+4. Your app still deploys as a fast static SPA
+
+**This is completely transparent** - you don't need to do anything extra!
+
+## If Build Still Fails
+
+If you still see the "Could not find file" error:
+
+1. **Option 1** (Recommended): Disable the plugin in Netlify UI
+   - Settings → Build & Deploy → Plugins → Remove `@netlify/angular-runtime`
+   
+2. **Option 2**: The automatic fix should have resolved it - try:
+   - Hard refresh the build (Settings → Build & Deploy → Trigger deploy)
+   - Wait 30 seconds for cache to clear
+   - Trigger another deploy
+
+3. **Option 3**: Clear Netlify cache
+   - Settings → Build & deploy → Deployments
+   - Click the ... menu → Clear build cache
+   - Trigger a new deploy
 
 ## What You Get After Disabling
 
@@ -62,12 +99,20 @@ If you need server-side rendering on Netlify, deploy to:
 
 ## Deployment Checklist
 
-- [ ] Remove/Disable `@netlify/angular-runtime` plugin from Netlify dashboard
-- [ ] Push `netlify.toml` to GitHub
-- [ ] Netlify auto-deploys (check your connected repo)
-- [ ] Build should complete successfully
+- [ ] Commit and push `netlify.toml`, `netlify.yaml`, and `scripts/fix-netlify-build.js`
+- [ ] Connect repo to Netlify
+- [ ] (Optional) Disable `@netlify/angular-runtime` plugin in Netlify UI
+- [ ] Trigger a new deploy
+- [ ] Build should complete successfully ✅
 - [ ] Test at yourdomain.netlify.app
 - [ ] Verify routing works by navigating to different routes
+
+## Files Included in This Setup
+
+- `netlify.toml` - Main build configuration
+- `netlify.yaml` - Additional Netlify settings
+- `scripts/fix-netlify-build.js` - Post-build script that fixes Netlify Angular plugin issues
+- `package.json` - Updated with post-build hook
 
 ## Need Full Node.js SSR?
 
