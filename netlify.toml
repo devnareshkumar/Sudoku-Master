@@ -1,0 +1,50 @@
+# Netlify configuration for Sudoku Master Edition
+
+[build]
+  # Build command to generate production bundles
+  command = "npm run build"
+  
+  # Publish directory - for SSR apps, use the browser dist folder
+  # The server bundle will be handled separately
+  publish = "dist/app/browser"
+  
+  # Functions directory for Netlify Functions (if needed for API routes)
+  functions = "src/functions"
+
+[dev]
+  # Development server configuration
+  command = "npm run dev"
+  port = 3000
+  publish = "dist"
+
+# Redirect all routes to index.html for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Cache configuration for static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "no-referrer-when-downgrade"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;"
