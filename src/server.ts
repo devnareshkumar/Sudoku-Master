@@ -10,16 +10,7 @@ import {join} from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-
-// Configure allowed hosts based on environment
-const isProduction = process.env['NODE_ENV'] === 'production';
-const allowedHosts = isProduction 
-  ? ['yourdomain.com', 'www.yourdomain.com'] // Update with your production domain
-  : ['localhost', '127.0.0.1', '192.168.0.4'];
-
-const angularApp = new AngularNodeAppEngine({
-  allowedHosts: allowedHosts
-});
+const angularApp = new AngularNodeAppEngine();
 
 /**
  * Example Express Rest API endpoints can be defined here.

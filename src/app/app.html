@@ -1,11 +1,11 @@
 <div class="min-h-screen bg-white p-4 lg:p-8 flex flex-col items-center font-sans text-slate-900">
   
   <!-- Top Difficulty Selector -->
-  <div class="w-full max-w-5xl flex justify-center gap-8 mb-12 border-b border-slate-100 pb-4">
+  <div class="w-full max-w-5xl flex justify-start sm:justify-center gap-2 sm:gap-8 mb-8 sm:mb-12 border-b border-slate-100 pb-4 overflow-x-auto no-scrollbar px-2">
     @for (d of difficulties; track d) {
       <button 
         (click)="sudokuService.requestNewGame(d)"
-        class="text-xs font-bold uppercase tracking-[0.2em] transition-all py-2 px-4 rounded-lg"
+        class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] transition-all py-2 px-3 sm:px-4 rounded-lg whitespace-nowrap"
         [class.text-blue-600]="sudokuService.difficulty() === d"
         [class.bg-blue-50]="sudokuService.difficulty() === d"
         [class.text-slate-400]="sudokuService.difficulty() !== d"
@@ -15,10 +15,10 @@
     }
   </div>
 
-  <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-24 justify-center items-start">
+  <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-24 justify-center items-center lg:items-start">
     
     <!-- Left Side: Board -->
-    <div class="relative flex-none w-full max-w-[450px] lg:max-w-[700px]">
+    <div class="relative flex-none w-full max-w-[450px] lg:max-w-[700px] px-2 sm:px-0">
       <div class="sudoku-grid shadow-2xl rounded-sm overflow-hidden bg-white">
         @for (cell of sudokuService.board(); track $index) {
           <div 
@@ -149,7 +149,7 @@
     </div>
 
     <!-- Right Side: Controls -->
-    <div class="flex-none w-80 flex flex-col gap-8">
+    <div class="flex-none w-full max-w-[450px] lg:w-80 flex flex-col gap-6 sm:gap-8 px-2 sm:px-0">
       
       <!-- Stats Row -->
       <div class="flex justify-between items-end border-b border-slate-100 pb-4">
