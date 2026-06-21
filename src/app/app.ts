@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, HostListener, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SudokuService, Difficulty } from './sudoku.service';
+import { SudokuService } from './sudoku.service';
+import type { Difficulty } from './models/game-state';
 import { 
   LucideAngularModule, 
   Brain, 

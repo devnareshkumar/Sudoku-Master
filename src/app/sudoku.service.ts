@@ -1,33 +1,9 @@
 import { Injectable, signal, effect, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { getSudoku } from 'sudoku-gen';
+import type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from './models/game-state';
 
-export type Difficulty = 'easy' | 'medium' | 'hard' | 'expert';
-
-export interface SudokuCell {
-  value: number | null;
-  solution: number;
-  initial: boolean;
-  notes: Set<number>;
-  error: boolean;
-}
-
-export interface GameStats {
-  bestTimes: Record<Difficulty, number | null>;
-  gamesWon: number;
-  gamesPlayed: number;
-  currentStreak: number;
-}
-
-export interface HintDetails {
-  index: number;
-  value: number;
-  row: number;
-  col: number;
-  box: number;
-  reason: string;
-  conflictingNumbers: { num: number; type: 'row' | 'col' | 'box'; index: number }[];
-}
+export type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from './models/game-state';
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +16,7 @@ export class SudokuService {
   mistakes = signal<number>(0);
   isNoteMode = signal<boolean>(false);
   isPaused = signal<boolean>(false);
-  gameStatus = signal<'playing' | 'won' | 'lost'>('playing');
+  gameStatus = signal<GameStatus>('playing');
   timer = signal<number>(0);
   hintsRemaining = signal<number>(3);
   
