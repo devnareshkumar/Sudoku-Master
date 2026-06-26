@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, HostListener, effect, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, HostListener, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AnalyticsService } from './services/analytics.service';
 import { SudokuService } from './sudoku.service';
 import type { Difficulty } from './models/game-state';
 import { 
@@ -38,6 +39,9 @@ import confetti from 'canvas-confetti';
 })
 export class App {
   sudokuService = inject(SudokuService);
+  analytics = inject(AnalyticsService);
+  destroyRef = inject(DestroyRef);
+  private sessionEndTracked = false;
   
   readonly Brain = Brain;
   readonly Trophy = Trophy;
@@ -64,7 +68,9 @@ export class App {
   showSettings = signal(false);
 
   constructor() {
+    this.analytics.trackAppLaunch();
     this.sudokuService.newGame();
+    this.destroyRef.onDestroy(() => this.trackSessionEndOnce());
 
     // Win effect
     effect(() => {
@@ -87,6 +93,11 @@ export class App {
     });
   }
 
+  @HostListener('window:beforeunload')
+  onBeforeUnload() {
+    this.trackSessionEndOnce();
+  }
+
   @HostListener('window:keydown', ['$event'])
   handleKeyboard(event: KeyboardEvent) {
     const selected = this.sudokuService.selectedCellIndex();
@@ -103,6 +114,13 @@ export class App {
     } else if (event.key.startsWith('Arrow')) {
       this.moveSelection(event.key);
     }
+  }
+
+  private trackSessionEndOnce() {
+    if (this.sessionEndTracked || typeof window === 'undefined') return;
+
+    this.sessionEndTracked = true;
+    this.analytics.trackSessionEnd();
   }
 
   moveSelection(key: string) {

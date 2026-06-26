@@ -16,3 +16,16 @@ export interface UserSettings {
   autoSave: boolean;
   analyticsOptIn: boolean;
 }
+
+export interface PremiumState {
+  isPremium: boolean;
+  provider: 'local' | 'stripe' | 'playstore' | 'appstore';
+  activatedAt?: number;
+  expiresAt?: number;
+}
+
+export interface FeatureEntitlements {
+  adFree: boolean;
+  unlimitedHints: boolean;
+  premiumThemes: boolean;
+}
