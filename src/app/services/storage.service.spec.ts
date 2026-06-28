@@ -44,11 +44,14 @@ describe('StorageService', () => {
 
   it('saves and loads premium state successfully', () => {
     const premiumState = {
+      isPremium: false,
+      provider: 'local' as const,
       active: true,
       expiresAt: '2026-12-31T23:59:59.000Z',
       entitlements: {
         unlimitedHints: true,
         adFree: true,
+        premiumThemes: true,
         premiumThemeAccess: true
       }
     };
@@ -130,11 +133,14 @@ describe('StorageService', () => {
       analyticsOptIn: false
     });
     expect(storageService.loadPremiumState()).toEqual({
+      isPremium: false,
+      provider: 'local',
       active: false,
       expiresAt: null,
       entitlements: {
         unlimitedHints: false,
         adFree: false,
+        premiumThemes: false,
         premiumThemeAccess: false
       }
     });

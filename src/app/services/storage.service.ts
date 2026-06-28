@@ -173,11 +173,14 @@ export class StorageService {
 
   private defaultPremiumState(): PremiumState {
     return {
+      isPremium: false,
+      provider: 'local',
       active: false,
       expiresAt: null,
       entitlements: {
         unlimitedHints: false,
         adFree: false,
+        premiumThemes: false,
         premiumThemeAccess: false
       }
     };

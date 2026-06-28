@@ -16,7 +16,8 @@ export class PremiumService {
   entitlements = computed<FeatureEntitlements>(() => ({
     adFree: this.premiumState().isPremium,
     unlimitedHints: this.premiumState().isPremium,
-    premiumThemes: this.premiumState().isPremium
+    premiumThemes: this.premiumState().isPremium,
+    premiumThemeAccess: this.premiumState().isPremium
   }));
 
   constructor() {
@@ -34,7 +35,14 @@ export class PremiumService {
     const state: PremiumState = {
       isPremium: true,
       provider,
-      activatedAt: Date.now()
+      activatedAt: Date.now(),
+      active: true,
+      entitlements: {
+        adFree: true,
+        unlimitedHints: true,
+        premiumThemes: true,
+        premiumThemeAccess: true
+      }
     };
 
     this.premiumState.set(state);
@@ -44,7 +52,14 @@ export class PremiumService {
   disablePremium() {
     const state: PremiumState = {
       isPremium: false,
-      provider: 'local'
+      provider: 'local',
+      active: false,
+      entitlements: {
+        adFree: false,
+        unlimitedHints: false,
+        premiumThemes: false,
+        premiumThemeAccess: false
+      }
     };
 
     this.premiumState.set(state);

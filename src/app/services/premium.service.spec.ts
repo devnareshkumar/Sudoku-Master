@@ -44,7 +44,7 @@ describe('PremiumService', () => {
         isPremium: false,
         provider: 'local'
       } as PremiumState))
-    } as unknown as StorageService;
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -70,7 +70,8 @@ describe('PremiumService', () => {
     expect(service.entitlements()).toEqual({
       adFree: false,
       unlimitedHints: false,
-      premiumThemes: false
+      premiumThemes: false,
+      premiumThemeAccess: false
     });
   });
 
@@ -86,7 +87,8 @@ describe('PremiumService', () => {
     expect(service.entitlements()).toEqual({
       adFree: true,
       unlimitedHints: true,
-      premiumThemes: true
+      premiumThemes: true,
+      premiumThemeAccess: true
     });
     expect(storageMock.savePremiumState).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -104,7 +106,8 @@ describe('PremiumService', () => {
     expect(service.entitlements()).toEqual({
       adFree: false,
       unlimitedHints: false,
-      premiumThemes: false
+      premiumThemes: false,
+      premiumThemeAccess: false
     });
     expect(storageMock.savePremiumState).toHaveBeenLastCalledWith(
       expect.objectContaining({
