@@ -20,14 +20,14 @@ Transform **Sudoku Master** from a monolithic Angular Sudoku app into a scalable
 | Regression Protection   | ✅ Done    |
 | Domain Models           | ✅ Done    |
 | Storage Layer           | 🟡 Partial |
-| Monetization Foundation | ⬜ Pending |
+| Monetization Foundation | 🟡 Partial |
 | Component Refactor      | ⬜ Pending |
 | Ad Integration          | ⬜ Pending |
 | Retention Features      | ⬜ Pending |
 
 ### Overall Completion
 
-**~28%**
+**~40%**
 
 ---
 
@@ -90,7 +90,7 @@ Stable domain contracts.
 
 ## Step 3 — Extract StorageService
 
-**Status:** 🟡 Partially Completed (Step 3A done)
+**Status:** 🟡 Partially Completed (persistence abstraction is implemented; startup restore remains pending)
 **Risk:** Medium
 
 ### Files Added
@@ -125,7 +125,7 @@ Persistence abstraction.
 
 ## Step 4 — AnalyticsService
 
-**Status:** ⬜ Pending
+**Status:** 🟡 Partially Completed (core analytics pipeline and app/session integration are live)
 **Priority:** HIGH
 **Risk:** Low
 
@@ -136,16 +136,16 @@ Persistence abstraction.
 
 ### Checklist
 
-- [ ] Create analytics service
-- [ ] Add unit tests
-- [ ] Define typed events
-- [ ] Track app launch
+- [x] Create analytics service
+- [x] Add unit tests
+- [x] Define typed events
+- [x] Track app launch
 - [ ] Track puzzle start
-- [ ] Track puzzle completion
-- [ ] Track hint usage
+- [x] Track puzzle completion
+- [x] Track hint usage
 - [ ] Track ad display
-- [ ] Track session duration
-- [ ] Add SSR guards
+- [x] Track session duration
+- [x] Add SSR-safe browser integration
 
 ### Event Types
 
@@ -159,13 +159,13 @@ Persistence abstraction.
 
 ### Deliverable
 
-Analytics pipeline for monetization.
+Analytics pipeline for monetization with core event tracking now wired into app startup and session lifecycle.
 
 ---
 
 ## Step 5 — PremiumService
 
-**Status:** ⬜ Pending
+**Status:** 🟡 Partially Completed (premium state service and persistence are implemented)
 **Priority:** HIGH
 **Risk:** Low-Medium
 
@@ -176,16 +176,16 @@ Analytics pipeline for monetization.
 
 ### Checklist
 
-- [ ] Create premium service
-- [ ] Add tests
-- [ ] Persist premium state
-- [ ] Add entitlement checks
+- [x] Create premium service
+- [x] Add tests
+- [x] Persist premium state
+- [x] Add entitlement checks
 - [ ] Mock subscription provider
 - [ ] Prepare server verification contract
 
 ### Deliverable
 
-Premium entitlement system.
+Premium entitlement system foundation is in place and storage-backed.
 
 ---
 
