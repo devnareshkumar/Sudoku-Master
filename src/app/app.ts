@@ -69,7 +69,7 @@ export class App {
 
   constructor() {
     this.analytics.trackAppLaunch();
-    this.sudokuService.newGame();
+    this.sudokuService.initializeGame();
     this.destroyRef.onDestroy(() => this.trackSessionEndOnce());
 
     // Win effect

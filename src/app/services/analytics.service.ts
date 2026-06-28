@@ -28,6 +28,12 @@ export class AnalyticsService {
     this.hasTrackedLaunch = true;
   }
 
+  trackPuzzleStart(difficulty: string) {
+    this.trackEvent('puzzle_started', {
+      difficulty
+    });
+  }
+
   trackPuzzleComplete(
     difficulty: string,
     timeSeconds: number,
@@ -44,6 +50,12 @@ export class AnalyticsService {
 
   trackHintUsage() {
     this.trackEvent('hint_used');
+  }
+
+  trackAdDisplay(placement: string) {
+    this.trackEvent('ad_shown', {
+      placement
+    });
   }
 
   trackSessionEnd() {

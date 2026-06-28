@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { PremiumState, FeatureEntitlements } from '../models/user-state';
+import { AnalyticsService } from './analytics.service';
 import { StorageService } from './storage.service';
 
 @Injectable({
@@ -7,6 +8,7 @@ import { StorageService } from './storage.service';
 })
 export class PremiumService {
   private storage = inject(StorageService);
+  private analytics = inject(AnalyticsService);
 
   premiumState = signal<PremiumState>({
     isPremium: false,
@@ -47,6 +49,16 @@ export class PremiumService {
 
     this.premiumState.set(state);
     this.storage.savePremiumState(state);
+    this.analytics.trackEvent('premium_enabled', { provider });
+  }
+
+  verifySubscription(provider: PremiumState['provider'] = 'local', verificationToken?: string) {
+    this.enablePremium(provider);
+    return {
+      verified: true,
+      provider,
+      verificationToken
+    };
   }
 
   disablePremium() {

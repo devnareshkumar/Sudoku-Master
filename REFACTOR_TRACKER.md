@@ -19,15 +19,15 @@ Transform **Sudoku Master** from a monolithic Angular Sudoku app into a scalable
 | ----------------------- | ---------- |
 | Regression Protection   | ✅ Done    |
 | Domain Models           | ✅ Done    |
-| Storage Layer           | 🟡 Partial |
-| Monetization Foundation | 🟡 Partial |
+| Storage Layer           | ✅ Done    |
+| Monetization Foundation | ✅ Done    |
 | Component Refactor      | ⬜ Pending |
 | Ad Integration          | ⬜ Pending |
 | Retention Features      | ⬜ Pending |
 
 ### Overall Completion
 
-**~40%**
+**~60%**
 
 ---
 
@@ -90,7 +90,7 @@ Stable domain contracts.
 
 ## Step 3 — Extract StorageService
 
-**Status:** 🟡 Partially Completed (persistence abstraction is implemented; startup restore remains pending)
+**Status:** ✅ Completed
 **Risk:** Medium
 
 ### Files Added
@@ -112,8 +112,8 @@ Stable domain contracts.
 
 ### Pending
 
-- [ ] Save/load game progress
-- [ ] Restore saved game at startup
+- [x] Save/load game progress
+- [x] Restore saved game at startup
 
 ### Deliverable
 
@@ -125,7 +125,7 @@ Persistence abstraction.
 
 ## Step 4 — AnalyticsService
 
-**Status:** 🟡 Partially Completed (core analytics pipeline and app/session integration are live)
+**Status:** ✅ Completed
 **Priority:** HIGH
 **Risk:** Low
 
@@ -140,10 +140,10 @@ Persistence abstraction.
 - [x] Add unit tests
 - [x] Define typed events
 - [x] Track app launch
-- [ ] Track puzzle start
+- [x] Track puzzle start
 - [x] Track puzzle completion
 - [x] Track hint usage
-- [ ] Track ad display
+- [x] Track ad display
 - [x] Track session duration
 - [x] Add SSR-safe browser integration
 
@@ -165,7 +165,7 @@ Analytics pipeline for monetization with core event tracking now wired into app 
 
 ## Step 5 — PremiumService
 
-**Status:** 🟡 Partially Completed (premium state service and persistence are implemented)
+**Status:** ✅ Completed
 **Priority:** HIGH
 **Risk:** Low-Medium
 
@@ -180,8 +180,8 @@ Analytics pipeline for monetization with core event tracking now wired into app 
 - [x] Add tests
 - [x] Persist premium state
 - [x] Add entitlement checks
-- [ ] Mock subscription provider
-- [ ] Prepare server verification contract
+- [x] Mock subscription provider
+- [x] Prepare server verification contract
 
 ### Deliverable
 

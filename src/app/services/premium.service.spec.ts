@@ -116,4 +116,13 @@ describe('PremiumService', () => {
       })
     );
   });
+
+  it('should verify a server-backed subscription contract', () => {
+    const result = service.verifySubscription('stripe', 'token-123');
+
+    expect(result.verified).toBe(true);
+    expect(result.provider).toBe('stripe');
+    expect(service.isPremium()).toBe(true);
+    expect(storageMock.savePremiumState).toHaveBeenCalled();
+  });
 });

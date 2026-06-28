@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import type { PersistedGameState, PersistedSudokuCell } from '../models/game-state';
 import type { PremiumState, UserSettings } from '../models/user-state';
 
@@ -46,6 +47,9 @@ function safeParse<T>(value: string | null): Versioned<T> | null {
   return null;
 }
 
+@Injectable({
+  providedIn: 'root'
+})
 export class StorageService {
   isBrowser(): boolean {
     return isBrowserEnvironment();

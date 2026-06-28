@@ -1,10 +1,40 @@
 import {PLATFORM_ID} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
+import { JSDOM } from 'jsdom';
+import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
 import {SudokuCell, SudokuService} from './sudoku.service';
+import { AnalyticsService } from './services/analytics.service';
+import { StorageService } from './services/storage.service';
 import {FIXED_PUZZLE, FIXED_SOLUTION} from './test-data/sudoku.fixture';
 
 describe('SudokuService characterization', () => {
+  beforeAll(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      const dom = new JSDOM('<!doctype html><html><body></body></html>');
+      vi.stubGlobal('window', dom.window as unknown as Window);
+      vi.stubGlobal('document', dom.window.document as unknown as Document);
+      vi.stubGlobal('navigator', dom.window.navigator as unknown as Navigator);
+      vi.stubGlobal('HTMLElement', dom.window.HTMLElement as unknown as typeof HTMLElement);
+      vi.stubGlobal('Element', dom.window.Element as unknown as typeof Element);
+      vi.stubGlobal('Node', dom.window.Node as unknown as typeof Node);
+      vi.stubGlobal('getComputedStyle', dom.window.getComputedStyle.bind(dom.window) as typeof globalThis.getComputedStyle);
+      vi.stubGlobal(
+        'requestAnimationFrame',
+        dom.window.requestAnimationFrame
+          ? dom.window.requestAnimationFrame.bind(dom.window)
+          : ((cb: FrameRequestCallback) => setTimeout(cb, 0)) as unknown as typeof globalThis.requestAnimationFrame
+      );
+    }
+
+    try {
+      TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
+    } catch (error: unknown) {
+      if (!(error instanceof Error && /already been called/.test(error.message))) {
+        throw error;
+      }
+    }
+  });
   beforeEach(() => {
     vi.useFakeTimers();
     localStorage.clear();
@@ -21,7 +51,20 @@ describe('SudokuService characterization', () => {
     TestBed.configureTestingModule({
       providers: [
         SudokuService,
+        StorageService,
         {provide: PLATFORM_ID, useValue: platformId},
+        {
+          provide: AnalyticsService,
+          useValue: {
+            trackAppLaunch: vi.fn(),
+            trackEvent: vi.fn(),
+            trackPuzzleStart: vi.fn(),
+            trackPuzzleComplete: vi.fn(),
+            trackHintUsage: vi.fn(),
+            trackAdDisplay: vi.fn(),
+            trackSessionEnd: vi.fn()
+          }
+        }
       ],
     });
 
@@ -286,6 +329,35 @@ describe('SudokuService characterization', () => {
     expect(service.showAdPrompt()).toBe(true);
     expect(service.showHintModal()).toBe(false);
     expect(service.isWatchingAd()).toBe(false);
+  });
+
+  it('restores a saved game from storage when the app starts', () => {
+    const savedGame = {
+      board: [
+        { value: 5, notes: [], error: false, solution: 5, initial: true },
+        { value: null, notes: [1], error: false, solution: 4, initial: false }
+      ],
+      difficulty: 'easy',
+      selectedCellIndex: 1,
+      mistakes: 0,
+      isNoteMode: true,
+      isPaused: false,
+      gameStatus: 'playing',
+      timer: 22,
+      hintsRemaining: 2
+    };
+
+    localStorage.setItem('sudoku_game', JSON.stringify({ version: 1, data: savedGame }));
+
+    const service = createService();
+    service.initializeGame();
+
+    expect(service.board()[0].value).toBe(5);
+    expect(service.board()[1].notes.has(1)).toBe(true);
+    expect(service.selectedCellIndex()).toBe(1);
+    expect(service.isNoteMode()).toBe(true);
+    expect(service.timer()).toBe(22);
+    expect(service.hintsRemaining()).toBe(2);
   });
 
   it('restores hint availability after watching the rewarded ad', () => {

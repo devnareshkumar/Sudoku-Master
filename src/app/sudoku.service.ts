@@ -1,7 +1,9 @@
 import { Injectable, signal, effect, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { getSudoku } from 'sudoku-gen';
-import type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from './models/game-state';
+import type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus, PersistedGameState } from './models/game-state';
+import { AnalyticsService } from './services/analytics.service';
+import { StorageService } from './services/storage.service';
 
 export type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from './models/game-state';
 
@@ -45,6 +47,8 @@ export class SudokuService {
 
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
+  private storage = inject(StorageService);
+  private analytics = inject(AnalyticsService);
 
   constructor() {
     if (this.isBrowser) {
@@ -58,6 +62,14 @@ export class SudokuService {
         localStorage.setItem('sudoku-theme', this.theme());
         document.documentElement.setAttribute('data-theme', this.theme());
       }
+    });
+
+    effect(() => {
+      if (!this.isBrowser || this.board().length === 0) {
+        return;
+      }
+
+      this.storage.saveGame(this.toPersistedState());
     });
 
     // Timer logic
@@ -87,6 +99,18 @@ export class SudokuService {
     if (saved) {
       this.theme.set(saved);
     }
+  }
+
+  initializeGame() {
+    const savedGame = this.storage.loadGame();
+    if (!savedGame) {
+      this.newGame(this.difficulty());
+      return false;
+    }
+
+    this.newGame(savedGame.difficulty);
+    this.applyPersistedGameState(savedGame);
+    return true;
   }
 
   requestNewGame(diff: Difficulty = this.difficulty()) {
@@ -133,6 +157,7 @@ export class SudokuService {
 
   newGame(diff: Difficulty = this.difficulty()) {
     this.difficulty.set(diff);
+    this.analytics.trackPuzzleStart(diff);
     const puzzle = getSudoku(diff);
     
     const newBoard: SudokuCell[] = [];
@@ -237,6 +262,7 @@ export class SudokuService {
     if (this.gameStatus() !== 'playing') return;
 
     if (this.hintsRemaining() <= 0) {
+      this.analytics.trackAdDisplay('hint_gate');
       this.showAdPrompt.set(true);
       return;
     }
@@ -363,6 +389,51 @@ export class SudokuService {
 
   closeAdPrompt() {
     this.showAdPrompt.set(false);
+  }
+
+  private applyPersistedGameState(state: PersistedGameState) {
+    const restoredBoard = this.board().map((cell, index) => {
+      const savedCell = state.board[index];
+      if (!savedCell) {
+        return cell;
+      }
+
+      return {
+        ...cell,
+        value: savedCell.value,
+        notes: new Set(savedCell.notes ?? []),
+        error: savedCell.error ?? false
+      };
+    });
+
+    this.board.set(restoredBoard);
+    this.selectedCellIndex.set(state.selectedCellIndex);
+    this.mistakes.set(state.mistakes);
+    this.isNoteMode.set(state.isNoteMode);
+    this.isPaused.set(state.isPaused);
+    this.gameStatus.set(state.gameStatus);
+    this.timer.set(state.timer);
+    this.hintsRemaining.set(state.hintsRemaining);
+    this.history = [];
+    this.saveHistory();
+  }
+
+  private toPersistedState(): PersistedGameState {
+    return {
+      board: this.board().map((cell) => ({
+        value: cell.value,
+        notes: Array.from(cell.notes),
+        error: cell.error
+      })),
+      difficulty: this.difficulty(),
+      selectedCellIndex: this.selectedCellIndex(),
+      mistakes: this.mistakes(),
+      isNoteMode: this.isNoteMode(),
+      isPaused: this.isPaused(),
+      gameStatus: this.gameStatus(),
+      timer: this.timer(),
+      hintsRemaining: this.hintsRemaining()
+    };
   }
 
   private checkWin() {

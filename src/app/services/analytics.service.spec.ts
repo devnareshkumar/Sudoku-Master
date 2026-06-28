@@ -126,4 +126,24 @@ describe('AnalyticsService', () => {
       })
     );
   });
+
+  it('should log puzzle start and ad display events', () => {
+    service.trackPuzzleStart('expert');
+    service.trackAdDisplay('hint_gate');
+
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'puzzle_started',
+        properties: { difficulty: 'expert' }
+      })
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'ad_shown',
+        properties: { placement: 'hint_gate' }
+      })
+    );
+  });
 });
