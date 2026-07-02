@@ -1,4 +1,5 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { PremiumState, FeatureEntitlements } from '../models/user-state';
 import { AnalyticsService } from './analytics.service';
 import { StorageService } from './storage.service';
@@ -9,6 +10,8 @@ import { StorageService } from './storage.service';
 export class PremiumService {
   private storage = inject(StorageService);
   private analytics = inject(AnalyticsService);
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser = isPlatformBrowser(this.platformId);
 
   premiumState = signal<PremiumState>({
     isPremium: false,
@@ -23,6 +26,10 @@ export class PremiumService {
   }));
 
   constructor() {
+    if (!this.isBrowser) {
+      return;
+    }
+
     const saved = this.storage.loadPremiumState();
     if (saved) {
       this.premiumState.set(saved);

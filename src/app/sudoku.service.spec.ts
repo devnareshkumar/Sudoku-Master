@@ -3,9 +3,11 @@ import {TestBed} from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import { JSDOM } from 'jsdom';
 import {afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest';
-import {SudokuCell, SudokuService} from './sudoku.service';
+import {SudokuCell, SudokuService} from './services/sudoku.service';
 import { AnalyticsService } from './services/analytics.service';
 import { StorageService } from './services/storage.service';
+import { AdService } from './services/ad.service';
+import { PremiumService } from './services/premium.service';
 import {FIXED_PUZZLE, FIXED_SOLUTION} from './test-data/sudoku.fixture';
 
 describe('SudokuService characterization', () => {
@@ -261,9 +263,11 @@ describe('SudokuService characterization', () => {
       gamesPlayed: 1,
       currentStreak: 1,
     });
-    expect(JSON.parse(localStorage.getItem('sudoku-stats') ?? '{}')).toEqual(
-      service.stats(),
-    );
+    const persistedStats = JSON.parse(localStorage.getItem('sudoku-stats') ?? '{}');
+    expect(persistedStats).toEqual({
+      version: 1,
+      data: service.stats(),
+    });
   });
 
   it('activates win state when the final missing cell is filled correctly', () => {
@@ -329,6 +333,49 @@ describe('SudokuService characterization', () => {
     expect(service.showAdPrompt()).toBe(true);
     expect(service.showHintModal()).toBe(false);
     expect(service.isWatchingAd()).toBe(false);
+  });
+
+  it('exposes readonly signals that stay in sync with the writable state', () => {
+    const service = createService();
+
+    service.board.set([]);
+    expect(service.boardSignal()).toEqual([]);
+
+    service.theme.set('dark');
+    expect(service.themeSignal()).toBe('dark');
+  });
+
+  it('delegates puzzle start analytics and save operations to the extracted services', () => {
+    const service = createService();
+    const storage = TestBed.inject(StorageService);
+    const analytics = TestBed.inject(AnalyticsService) as unknown as {
+      trackPuzzleStart: ReturnType<typeof vi.fn>;
+    };
+    const saveGameSpy = vi.spyOn(storage, 'saveGame');
+
+    service.newGame('easy');
+    TestBed.flushEffects();
+
+    expect(analytics.trackPuzzleStart).toHaveBeenCalledWith('easy');
+    expect(saveGameSpy).toHaveBeenCalled();
+  });
+
+  it('uses premium and ad services to gate hints without changing the hint flow', () => {
+    const service = createService();
+    startGame(service);
+    const premiumService = TestBed.inject(PremiumService);
+    const adService = TestBed.inject(AdService);
+    const isPremiumSpy = vi.spyOn(premiumService, 'isPremium').mockReturnValue(false);
+    const canUseHintFreelySpy = vi.spyOn(adService, 'canUseHintFreely').mockReturnValue(false);
+    const openAdPromptSpy = vi.spyOn(adService, 'openAdPrompt');
+
+    service.selectedCellIndex.set(2);
+    service.useHint();
+
+    expect(isPremiumSpy).toHaveBeenCalled();
+    expect(canUseHintFreelySpy).toHaveBeenCalledWith(4, false);
+    expect(openAdPromptSpy).toHaveBeenCalled();
+    expect(service.showHintModal()).toBe(false);
   });
 
   it('restores a saved game from storage when the app starts', () => {
@@ -409,15 +456,26 @@ describe('SudokuService characterization', () => {
     const getItem = vi.spyOn(Storage.prototype, 'getItem');
     const setItem = vi.spyOn(Storage.prototype, 'setItem');
     const setAttribute = vi.spyOn(document.documentElement, 'setAttribute');
+    const setIntervalSpy = vi.spyOn(globalThis, 'setInterval');
 
     const service = createService('server');
     TestBed.flushEffects();
 
     expect(service.theme()).toBe('classic');
+    expect(getItem).not.toHaveBeenCalled();
     expect(setItem).not.toHaveBeenCalled();
+    expect(setIntervalSpy).not.toHaveBeenCalled();
     expect(setAttribute).not.toHaveBeenCalledWith('data-theme', expect.any(String));
-    expect(setItem).not.toHaveBeenCalled();
-    expect(setAttribute).not.toHaveBeenCalledWith('data-theme', expect.any(String));
+  });
+
+  it('cleans up the timer when the service is destroyed', () => {
+    const clearIntervalSpy = vi.spyOn(globalThis, 'clearInterval');
+    const service = createService();
+
+    TestBed.resetTestingModule();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    expect(service.gameStatus()).toBe('playing');
   });
 
   describe('legacy behavior to preserve during structural refactors', () => {

@@ -229,22 +229,26 @@ Monetization-ready hint gating.
 
 ## Step 7 — Refactor SudokuService
 
-**Status:** ⬜ Pending
+**Status:** ✅ Completed
 **Priority:** HIGH
 **Risk:** Medium
 
 ### Checklist
 
-- [ ] Move to `services/sudoku.service.ts`
-- [ ] Reduce responsibilities
-- [ ] Delegate storage
-- [ ] Delegate analytics
-- [ ] Delegate premium
-- [ ] Delegate ads
-- [ ] Extract sudoku-grid utilities
-- [ ] Add readonly signals
-- [ ] Improve SSR safety
-- [ ] Fix timer cleanup
+- [x] Move to `services/sudoku.service.ts`
+- [x] Reduce responsibilities
+- [x] Delegate storage
+- [x] Delegate analytics
+- [x] Delegate premium
+- [x] Delegate ads
+- [x] Extract sudoku-grid utilities
+- [x] Add readonly signals
+- [x] Improve SSR safety
+- [x] Fix timer cleanup
+
+### Architectural Outcome
+
+SudokuService now functions as a thin orchestration layer: it coordinates gameplay state and user interactions while delegating persistence, analytics, premium checks, ad behavior, and grid-logic helpers to dedicated services and utilities.
 
 ### Deliverable
 

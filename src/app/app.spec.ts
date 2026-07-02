@@ -5,7 +5,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { App } from './app';
 import { AnalyticsService } from './services/analytics.service';
 import { StorageService } from './services/storage.service';
-import { SudokuService } from './sudoku.service';
+import { SudokuService } from './services/sudoku.service';
 
 describe('App characterization', () => {
   let app: App;

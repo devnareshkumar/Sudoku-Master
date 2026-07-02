@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
-import type { PersistedGameState, PersistedSudokuCell } from '../models/game-state';
+import type { GameStats, PersistedGameState, PersistedSudokuCell } from '../models/game-state';
 import type { PremiumState, UserSettings } from '../models/user-state';
 
 const STORAGE_KEYS = {
   settings: 'sudoku_settings',
   game: 'sudoku_game',
   premium: 'sudoku_premium',
-  stats: 'sudoku_stats'
+  stats: 'sudoku-stats',
+  theme: 'sudoku-theme',
+  legacyStats: 'sudoku_stats',
+  legacyTheme: 'sudoku_theme'
 } as const;
 
 const STORAGE_SCHEMA_VERSION = 1;
@@ -73,6 +76,36 @@ export class StorageService {
     return result?.data ?? this.defaultPremiumState();
   }
 
+  saveTheme(theme: string): void {
+    this.write(STORAGE_KEYS.theme, theme);
+    this.write(STORAGE_KEYS.legacyTheme, theme);
+  }
+
+  loadTheme(): string | null {
+    const result = this.read<string>(STORAGE_KEYS.theme);
+    if (result?.data) {
+      return result.data;
+    }
+
+    const legacyResult = this.read<string>(STORAGE_KEYS.legacyTheme);
+    return legacyResult?.data ?? null;
+  }
+
+  saveStats(stats: GameStats): void {
+    this.write(STORAGE_KEYS.stats, stats);
+    this.write(STORAGE_KEYS.legacyStats, stats);
+  }
+
+  loadStats(): GameStats | null {
+    const result = this.read<GameStats>(STORAGE_KEYS.stats);
+    if (result?.data) {
+      return result.data;
+    }
+
+    const legacyResult = this.read<GameStats>(STORAGE_KEYS.legacyStats);
+    return legacyResult?.data ?? null;
+  }
+
   saveGame(gameState: PersistedGameState): void {
     const payload = {
       ...gameState,
@@ -111,6 +144,9 @@ export class StorageService {
     this.remove(STORAGE_KEYS.game);
     this.remove(STORAGE_KEYS.premium);
     this.remove(STORAGE_KEYS.stats);
+    this.remove(STORAGE_KEYS.legacyStats);
+    this.remove(STORAGE_KEYS.theme);
+    this.remove(STORAGE_KEYS.legacyTheme);
   }
 
   private read<T>(key: string): Versioned<T> | null {
