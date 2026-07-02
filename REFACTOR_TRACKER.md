@@ -22,12 +22,12 @@ Transform **Sudoku Master** from a monolithic Angular Sudoku app into a scalable
 | Storage Layer           | ✅ Done    |
 | Monetization Foundation | ✅ Done    |
 | Component Refactor      | ⬜ Pending |
-| Ad Integration          | ⬜ Pending |
+| Ad Integration          | 🟡 Partial |
 | Retention Features      | ⬜ Pending |
 
 ### Overall Completion
 
-**~60%**
+**~65%**
 
 ---
 
@@ -191,7 +191,7 @@ Premium entitlement system foundation is in place and storage-backed.
 
 ## Step 6 — AdService
 
-**Status:** ⬜ Pending
+**Status:** ✅ Completed
 **Priority:** CRITICAL
 **Risk:** Medium
 
@@ -202,15 +202,15 @@ Premium entitlement system foundation is in place and storage-backed.
 
 ### Checklist
 
-- [ ] Create ad service
-- [ ] Add tests
-- [ ] Change hints limit 3 → 4
-- [ ] Add rewarded credits
-- [ ] Add premium bypass
-- [ ] Add ad prompt state
-- [ ] Preserve 3-sec mock ad
-- [ ] Add interstitial eligibility
-- [ ] Analytics integration
+- [x] Create ad service
+- [x] Add tests
+- [x] Change hints limit 3 → 4
+- [x] Add rewarded credits
+- [x] Add premium bypass
+- [x] Add ad prompt state
+- [x] Preserve 3-sec mock ad
+- [x] Add interstitial eligibility
+- [x] Analytics integration
 
 ### Business Rules
 

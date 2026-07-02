@@ -146,4 +146,48 @@ describe('AnalyticsService', () => {
       })
     );
   });
+
+  it('should log rewarded-ad and interstitial analytics events', () => {
+    service.trackRewardedAdStarted('hint_gate');
+    service.trackRewardedAdCompleted('hint_gate');
+    service.trackRewardedCreditConsumed('hint_gate');
+    service.trackInterstitialEligibility(true, 'gameplay');
+    service.trackInterstitialShown('gameplay');
+
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'rewarded_ad_started',
+        properties: { placement: 'hint_gate' }
+      })
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'rewarded_ad_completed',
+        properties: { placement: 'hint_gate' }
+      })
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'rewarded_credit_consumed',
+        properties: { placement: 'hint_gate' }
+      })
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'interstitial_eligible',
+        properties: { eligible: true, placement: 'gameplay' }
+      })
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      '[Analytics]',
+      expect.objectContaining({
+        name: 'interstitial_shown',
+        properties: { placement: 'gameplay' }
+      })
+    );
+  });
 });

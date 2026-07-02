@@ -287,7 +287,7 @@ describe('SudokuService characterization', () => {
     expect(service.gameStatus()).toBe('won');
   });
 
-  it('characterizes the current allowance of three hints per puzzle', () => {
+  it('characterizes the current allowance of four hints per puzzle', () => {
     const service = createService();
     startGame(service);
     const emptyIndices = service
@@ -295,9 +295,9 @@ describe('SudokuService characterization', () => {
       .map((cell, index) => (cell.initial ? -1 : index))
       .filter((index) => index >= 0);
 
-    expect(service.hintsRemaining()).toBe(3);
+    expect(service.hintsRemaining()).toBe(4);
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       const index = emptyIndices[i];
       service.selectedCellIndex.set(index);
       service.useHint();
@@ -305,7 +305,7 @@ describe('SudokuService characterization', () => {
       expect(service.showHintModal()).toBe(true);
       expect(service.currentHint()?.index).toBe(index);
       service.confirmHint();
-      expect(service.hintsRemaining()).toBe(2 - i);
+      expect(service.hintsRemaining()).toBe(3 - i);
       expect(service.showHintModal()).toBe(false);
       expect(service.board()[index].value).toBe(service.board()[index].solution);
     }
@@ -377,7 +377,7 @@ describe('SudokuService characterization', () => {
     vi.advanceTimersByTime(3000);
 
     expect(service.isWatchingAd()).toBe(false);
-    expect(service.hintsRemaining()).toBe(1);
+    expect(service.hintsRemaining()).toBe(0);
     expect(service.showHintModal()).toBe(true);
     expect(service.currentHint()).not.toBeNull();
     expect(service.currentHint()?.index).toBe(emptyIndex);
@@ -400,7 +400,7 @@ describe('SudokuService characterization', () => {
 
     vi.advanceTimersByTime(1);
     expect(service.isWatchingAd()).toBe(false);
-    expect(service.hintsRemaining()).toBe(1);
+    expect(service.hintsRemaining()).toBe(0);
     expect(service.showHintModal()).toBe(true);
     expect(service.currentHint()?.index).toBe(2);
   });
@@ -414,7 +414,8 @@ describe('SudokuService characterization', () => {
     TestBed.flushEffects();
 
     expect(service.theme()).toBe('classic');
-    expect(getItem).not.toHaveBeenCalled();
+    expect(setItem).not.toHaveBeenCalled();
+    expect(setAttribute).not.toHaveBeenCalledWith('data-theme', expect.any(String));
     expect(setItem).not.toHaveBeenCalled();
     expect(setAttribute).not.toHaveBeenCalledWith('data-theme', expect.any(String));
   });
@@ -431,7 +432,7 @@ describe('SudokuService characterization', () => {
 
       expect(service.board()[2].value).toBeNull();
       expect(service.board()[2].notes.has(4)).toBe(true);
-      expect(service.hintsRemaining()).toBe(2);
+      expect(service.hintsRemaining()).toBe(3);
     });
   });
 });

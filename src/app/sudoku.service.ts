@@ -4,6 +4,8 @@ import { getSudoku } from 'sudoku-gen';
 import type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus, PersistedGameState } from './models/game-state';
 import { AnalyticsService } from './services/analytics.service';
 import { StorageService } from './services/storage.service';
+import { AdService } from './services/ad.service';
+import { PremiumService } from './services/premium.service';
 
 export type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from './models/game-state';
 
@@ -20,17 +22,17 @@ export class SudokuService {
   isPaused = signal<boolean>(false);
   gameStatus = signal<GameStatus>('playing');
   timer = signal<number>(0);
-  hintsRemaining = signal<number>(3);
+  hintsRemaining = signal<number>(4);
   
   // Hint Modal State
   showHintModal = signal<boolean>(false);
   currentHint = signal<HintDetails | null>(null);
   hintStep = signal<number>(0);
-  showAdPrompt = signal<boolean>(false);
-  isWatchingAd = signal<boolean>(false);
   showNewGameConfirm = signal<boolean>(false);
   pendingDifficulty = signal<Difficulty | null>(null);
-  
+
+
+
   // History for Undo
   private history: string[] = [];
 
@@ -49,6 +51,17 @@ export class SudokuService {
   private isBrowser = isPlatformBrowser(this.platformId);
   private storage = inject(StorageService);
   private analytics = inject(AnalyticsService);
+  private adService = inject(AdService);
+  private premiumService = inject(PremiumService);
+
+  get showAdPrompt() {
+  return this.adService.showAdPrompt;
+}
+
+get isWatchingAd() {
+  return this.adService.isWatchingAd;
+}
+  
 
   constructor() {
     if (this.isBrowser) {
@@ -177,7 +190,7 @@ export class SudokuService {
     this.timer.set(0);
     this.gameStatus.set('playing');
     this.selectedCellIndex.set(null);
-    this.hintsRemaining.set(3);
+    this.hintsRemaining.set(4);
     this.history = [];
     this.saveHistory();
   }
@@ -258,91 +271,101 @@ export class SudokuService {
     this.saveHistory();
   }
 
-  useHint() {
-    if (this.gameStatus() !== 'playing') return;
+useHint() {
+  if (this.gameStatus() !== 'playing') return;
 
-    if (this.hintsRemaining() <= 0) {
-      this.analytics.trackAdDisplay('hint_gate');
-      this.showAdPrompt.set(true);
+  const isPremium = this.premiumService.isPremium();
+
+  if (!this.adService.canUseHintFreely(this.hintsRemaining(), isPremium)) {
+    this.adService.openAdPrompt();
+    return;
+  }
+
+  let consumedRewardedCredit = false;
+
+  if (!isPremium && this.hintsRemaining() <= 0) {
+    consumedRewardedCredit = this.adService.consumeRewardedHintCredit();
+    if (!consumedRewardedCredit) {
+      this.adService.openAdPrompt();
       return;
     }
-    
-    let targetIndex = this.selectedCellIndex();
-    if (targetIndex === null || this.board()[targetIndex].value !== null) {
-      const emptyIndices = this.board()
-        .map((c, i) => c.value === null ? i : -1)
-        .filter(i => i !== -1);
-      if (emptyIndices.length === 0) return;
-      targetIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-    }
-    
-    const cell = this.board()[targetIndex];
-    const solution = cell.solution;
-    const row = Math.floor(targetIndex / 9);
-    const col = targetIndex % 9;
-    const boxRow = Math.floor(row / 3) * 3;
-    const boxCol = Math.floor(col / 3) * 3;
-    const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
-
-    const conflicts: { num: number; type: 'row' | 'col' | 'box'; index: number }[] = [];
-    
-    // Find why other numbers don't fit
-    for (let n = 1; n <= 9; n++) {
-      if (n === solution) continue;
-      
-      // Check row
-      for (let i = 0; i < 9; i++) {
-        const idx = row * 9 + i;
-        if (this.board()[idx].value === n) {
-          conflicts.push({ num: n, type: 'row', index: idx });
-          break;
-        }
-      }
-      // Check col
-      for (let i = 0; i < 9; i++) {
-        const idx = i * 9 + col;
-        if (this.board()[idx].value === n) {
-          conflicts.push({ num: n, type: 'col', index: idx });
-          break;
-        }
-      }
-      // Check box
-      for (let r = 0; r < 3; r++) {
-        for (let c = 0; c < 3; c++) {
-          const idx = (boxRow + r) * 9 + (boxCol + c);
-          if (this.board()[idx].value === n) {
-            conflicts.push({ num: n, type: 'box', index: idx });
-            break;
-          }
-        }
-      }
-    }
-
-    const possibleNumbers = new Set([1,2,3,4,5,6,7,8,9]);
-    conflicts.forEach(c => possibleNumbers.delete(c.num));
-    
-    let reason = "";
-    if (possibleNumbers.size === 1) {
-      reason = `This is a "Naked Single". After analyzing the row, column, and 3x3 box, ${solution} is the only number that doesn't violate any Sudoku rules for this specific cell.`;
-    } else {
-      reason = `Based on the puzzle's unique solution, ${solution} is the required value. While other numbers might seem possible at first glance, they are eventually eliminated by the complex constraints of the entire grid.`;
-    }
-
-    const hint: HintDetails = {
-      index: targetIndex,
-      value: solution,
-      row: row + 1,
-      col: col + 1,
-      box: boxIndex + 1,
-      reason: reason,
-      conflictingNumbers: conflicts.slice(0, 12) // Limit for UI
-    };
-
-    this.currentHint.set(hint);
-    this.hintStep.set(0);
-    this.showHintModal.set(true);
-    this.selectedCellIndex.set(targetIndex);
   }
+
+  let targetIndex = this.selectedCellIndex();
+  if (targetIndex === null || this.board()[targetIndex].value !== null) {
+    const emptyIndices = this.board()
+      .map((c, i) => c.value === null ? i : -1)
+      .filter(i => i !== -1);
+
+    if (emptyIndices.length === 0) return;
+    targetIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  }
+
+  const cell = this.board()[targetIndex];
+  const solution = cell.solution;
+  const row = Math.floor(targetIndex / 9);
+  const col = targetIndex % 9;
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+
+  const conflicts: { num: number; type: 'row' | 'col' | 'box'; index: number }[] = [];
+
+  for (let n = 1; n <= 9; n++) {
+    if (n === solution) continue;
+
+    for (let i = 0; i < 9; i++) {
+      const idx = row * 9 + i;
+      if (this.board()[idx].value === n) {
+        conflicts.push({ num: n, type: 'row', index: idx });
+        break;
+      }
+    }
+
+    for (let i = 0; i < 9; i++) {
+      const idx = i * 9 + col;
+      if (this.board()[idx].value === n) {
+        conflicts.push({ num: n, type: 'col', index: idx });
+        break;
+      }
+    }
+
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        const idx = (boxRow + r) * 9 + (boxCol + c);
+        if (this.board()[idx].value === n) {
+          conflicts.push({ num: n, type: 'box', index: idx });
+          break;
+        }
+      }
+    }
+  }
+
+  const possibleNumbers = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+  conflicts.forEach(c => possibleNumbers.delete(c.num));
+
+  let reason = '';
+  if (possibleNumbers.size === 1) {
+    reason = `This is a "Naked Single". After analyzing the row, column, and 3x3 box, ${solution} is the only number that doesn't violate any Sudoku rules for this specific cell.`;
+  } else {
+    reason = `Based on the puzzle's unique solution, ${solution} is the required value. While other numbers might seem possible at first glance, they are eventually eliminated by the complex constraints of the entire grid.`;
+  }
+
+  const hint: HintDetails = {
+    index: targetIndex,
+    value: solution,
+    row: row + 1,
+    col: col + 1,
+    box: boxIndex + 1,
+    reason,
+    conflictingNumbers: conflicts.slice(0, 12)
+  };
+
+  this.currentHint.set(hint);
+  this.hintStep.set(0);
+  this.showHintModal.set(true);
+  this.selectedCellIndex.set(targetIndex);
+}
 
   nextHintStep() {
     if (this.hintStep() < 2) {
@@ -356,14 +379,20 @@ export class SudokuService {
     }
   }
 
-  confirmHint() {
-    const hint = this.currentHint();
-    if (!hint) return;
-    
-    this.setCellValue(hint.index, hint.value);
+confirmHint() {
+  const hint = this.currentHint();
+  if (!hint) return;
+
+  const isPremium = this.premiumService.isPremium();
+
+  this.setCellValue(hint.index, hint.value);
+
+  if (!isPremium && this.hintsRemaining() > 0) {
     this.hintsRemaining.update(h => h - 1);
-    this.closeHintModal();
   }
+
+  this.closeHintModal();
+}
 
   closeHintModal() {
     this.showHintModal.set(false);
@@ -375,21 +404,15 @@ export class SudokuService {
     this.hintsRemaining.update(h => h + 1);
   }
 
-  watchAd() {
-    this.isWatchingAd.set(true);
-    this.showAdPrompt.set(false);
-    // Simulate ad watching for 3 seconds
-    setTimeout(() => {
-      this.isWatchingAd.set(false);
-      this.hintsRemaining.set(1);
-      // Automatically trigger hint after ad
-      this.useHint();
-    }, 3000);
-  }
+watchAd() {
+  this.adService.watchRewardedAd(() => {
+    this.useHint();
+  });
+}
 
-  closeAdPrompt() {
-    this.showAdPrompt.set(false);
-  }
+closeAdPrompt() {
+  this.adService.closeAdPrompt();
+}
 
   private applyPersistedGameState(state: PersistedGameState) {
     const restoredBoard = this.board().map((cell, index) => {

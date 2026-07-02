@@ -58,6 +58,37 @@ export class AnalyticsService {
     });
   }
 
+  trackRewardedAdStarted(placement: string) {
+    this.trackEvent('rewarded_ad_started', {
+      placement
+    });
+  }
+
+  trackRewardedAdCompleted(placement: string) {
+    this.trackEvent('rewarded_ad_completed', {
+      placement
+    });
+  }
+
+  trackRewardedCreditConsumed(placement: string) {
+    this.trackEvent('rewarded_credit_consumed', {
+      placement
+    });
+  }
+
+  trackInterstitialEligibility(eligible: boolean, placement: string) {
+    this.trackEvent('interstitial_eligible', {
+      eligible,
+      placement
+    });
+  }
+
+  trackInterstitialShown(placement: string) {
+    this.trackEvent('interstitial_shown', {
+      placement
+    });
+  }
+
   trackSessionEnd() {
     const durationSeconds =
       Math.floor((Date.now() - this.sessionStart) / 1000);
