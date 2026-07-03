@@ -25,6 +25,11 @@ import {
   ArrowLeft
 } from 'lucide-angular';
 import confetti from 'canvas-confetti';
+import { StatsPanelComponent } from './stats-panel.component';
+import { ToolbarComponent } from './toolbar.component';
+import { NumberPadComponent } from './number-pad.component';
+import { SudokuBoardComponent } from './sudoku-board.component';
+import { HintModalComponent } from './hint-modal.component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,7 +37,12 @@ import confetti from 'canvas-confetti';
   standalone: true,
   imports: [
     CommonModule, 
-    LucideAngularModule
+    LucideAngularModule,
+    StatsPanelComponent,
+    ToolbarComponent,
+    NumberPadComponent,
+    SudokuBoardComponent,
+    HintModalComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -64,6 +74,9 @@ export class App {
 
   readonly difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'expert'];
   readonly themes = ['classic', 'dark', 'ocean', 'sepia'];
+
+  readonly getBoardCellClass = (index: number): string => this.getHighlightClass(index);
+  readonly isNumberComplete = (value: number): boolean => this.sudokuService.isNumberComplete(value);
 
   showSettings = signal(false);
 
@@ -223,6 +236,10 @@ export class App {
     }
 
     return classes;
+  }
+
+  onNumberSelect(value: number) {
+    this.sudokuService.setCellValue(this.sudokuService.selectedCellIndex()!, value);
   }
 
   toggleNoteMode() {

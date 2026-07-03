@@ -1,244 +1,67 @@
 <div class="min-h-screen bg-white p-4 lg:p-8 flex flex-col items-center font-sans text-slate-900">
   
   <!-- Top Difficulty Selector -->
-  <div class="w-full max-w-5xl flex justify-start sm:justify-center gap-2 sm:gap-8 mb-8 sm:mb-12 border-b border-slate-100 pb-4 overflow-x-auto no-scrollbar px-2">
-    @for (d of difficulties; track d) {
-      <button 
-        (click)="sudokuService.requestNewGame(d)"
-        class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] transition-all py-2 px-3 sm:px-4 rounded-lg whitespace-nowrap"
-        [class.text-blue-600]="sudokuService.difficulty() === d"
-        [class.bg-blue-50]="sudokuService.difficulty() === d"
-        [class.text-slate-400]="sudokuService.difficulty() !== d"
-      >
-        {{ d }}
-      </button>
-    }
-  </div>
+  <app-toolbar
+    [showDifficultySelector]="true"
+    [showGameControls]="false"
+    [difficulty]="sudokuService.difficulty()"
+    (difficultyChange)="sudokuService.requestNewGame($event)"
+  />
 
   <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-24 justify-center items-center lg:items-start">
     
     <!-- Left Side: Board -->
     <div class="relative flex-none w-full max-w-[450px] lg:max-w-[700px] px-2 sm:px-0">
-      <div class="sudoku-grid shadow-2xl rounded-sm overflow-hidden bg-white">
-        @for (cell of sudokuService.board(); track $index) {
-          <div 
-            class="sudoku-cell"
-            [class]="getHighlightClass($index)"
-            [attr.data-index]="$index"
-            (click)="sudokuService.selectedCellIndex.set($index)"
-            tabindex="0"
-            role="button"
-          >
-            @if (cell.value !== null) {
-              {{ cell.value }}
-            } @else {
-              <div class="notes-grid">
-                @for (n of [1,2,3,4,5,6,7,8,9]; track n) {
-                  <div class="note-digit">
-                    {{ cell.notes.has(n) ? n : '' }}
-                  </div>
-                }
-              </div>
-            }
-            
-            <!-- Hint Target Indicator (Green highlight) -->
-            @if (sudokuService.currentHint()?.index === $index && sudokuService.showHintModal()) {
-              <div class="absolute inset-0 bg-green-500 text-white flex items-center justify-center font-bold z-10 animate-in fade-in duration-300">
-                <!-- Value hidden until Accept is clicked -->
-              </div>
-            }
-          </div>
-        }
-      </div>
+      <app-sudoku-board
+        [cells]="sudokuService.board()"
+        [selectedCellIndex]="sudokuService.selectedCellIndex()"
+        [currentHintIndex]="sudokuService.currentHint()?.index ?? null"
+        [hintStep]="sudokuService.hintStep()"
+        [showHintModal]="sudokuService.showHintModal()"
+        [isPaused]="sudokuService.isPaused()"
+        [cellClass]="getBoardCellClass"
+        (cellSelect)="sudokuService.selectedCellIndex.set($event)"
+        (resume)="sudokuService.isPaused.set(false)"
+      />
 
-      <!-- Pause Overlay -->
-      @if (sudokuService.isPaused()) {
-        <div class="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-20">
-          <button (click)="sudokuService.isPaused.set(false)" class="p-6 bg-blue-600 text-white rounded-full shadow-xl hover:scale-110 transition-transform">
-            <lucide-icon [name]="Play" size="48"></lucide-icon>
-          </button>
-          <p class="mt-4 font-bold text-xl text-slate-800">Paused</p>
-        </div>
-      }
-
-      <!-- Hint Modal (Wizard Style) -->
-      @if (sudokuService.showHintModal() && sudokuService.currentHint(); as hint) {
-        <div class="absolute -right-4 top-10 w-80 bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] p-8 z-50 animate-in fade-in zoom-in duration-300 border border-slate-50">
-          
-          <div class="min-h-[140px] flex flex-col">
-            <h3 class="text-slate-800 font-black text-xl mb-2">
-              @switch (sudokuService.hintStep()) {
-                @case (0) { Last Remaining Cell }
-                @case (1) { Analysis }
-                @case (2) { Solution Found }
-              }
-            </h3>
-            
-            <div class="flex-1">
-              @switch (sudokuService.hintStep()) {
-                @case (0) {
-                  <p class="text-slate-500 text-sm leading-relaxed">
-                    Pay attention to <span class="text-blue-600 font-bold">this cell</span> and the highlighted areas around it.
-                  </p>
-                }
-                @case (1) {
-                  <p class="text-slate-500 text-sm leading-relaxed">
-                    {{ hint.reason }}
-                  </p>
-                }
-                @case (2) {
-                  <div class="flex flex-col items-center gap-3 py-2">
-                    <h4 class="text-blue-600 font-bold text-sm uppercase tracking-widest">Ready to Solve</h4>
-                    <p class="text-slate-500 text-sm text-center">
-                      Click <span class="font-bold text-slate-800">Accept</span> to reveal the solution and fill this cell.
-                    </p>
-                    <div class="w-14 h-14 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center text-3xl font-black border-2 border-dashed border-slate-200">
-                      ?
-                    </div>
-                  </div>
-                }
-              }
-            </div>
-          </div>
-          
-          <div class="mt-8 flex items-center justify-between">
-            <!-- Step Indicators -->
-            <div class="flex gap-2">
-              @for (step of [0, 1, 2]; track step) {
-                <div 
-                  class="w-2 h-2 rounded-full transition-all duration-300"
-                  [class.bg-blue-600]="sudokuService.hintStep() === step"
-                  [class.w-5]="sudokuService.hintStep() === step"
-                  [class.bg-slate-200]="sudokuService.hintStep() !== step"
-                ></div>
-              }
-            </div>
-            
-            <div class="flex gap-2 items-center">
-              @if (sudokuService.hintStep() === 2) {
-                <button 
-                  (click)="sudokuService.confirmHint()"
-                  class="px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold text-sm shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all flex items-center gap-2 group"
-                >
-                  <lucide-icon [name]="CheckCircle2" size="18" class="group-hover:scale-110 transition-transform"></lucide-icon>
-                  Accept
-                </button>
-              } @else {
-                @if (sudokuService.hintStep() > 0) {
-                  <button 
-                    (click)="sudokuService.prevHintStep()"
-                    class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-200 hover:text-slate-600 transition-all group"
-                    aria-label="Previous step"
-                  >
-                    <lucide-icon [name]="ArrowLeft" size="18" class="group-hover:-translate-x-0.5 transition-transform"></lucide-icon>
-                  </button>
-                }
-                
-                <button 
-                  (click)="sudokuService.nextHintStep()"
-                  class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm group"
-                  aria-label="Next step"
-                >
-                  <lucide-icon [name]="ArrowRight" size="18" class="group-hover:translate-x-0.5 transition-transform"></lucide-icon>
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-      }
+      <app-hint-modal
+        [visible]="sudokuService.showHintModal()"
+        [hint]="sudokuService.currentHint()"
+        [step]="sudokuService.hintStep()"
+        (nextStep)="sudokuService.nextHintStep()"
+        (prevStep)="sudokuService.prevHintStep()"
+        (confirm)="sudokuService.confirmHint()"
+      />
     </div>
 
     <!-- Right Side: Controls -->
     <div class="flex-none w-full max-w-[450px] lg:w-80 flex flex-col gap-6 sm:gap-8 px-2 sm:px-0">
       
-      <!-- Stats Row -->
-      <div class="flex justify-between items-end border-b border-slate-100 pb-4">
-        <div class="flex flex-col">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Mistakes</span>
-          <div class="px-3 py-1 bg-slate-50 rounded border border-slate-200 font-mono font-bold text-lg">
-            {{ sudokuService.mistakes() }}/3
-          </div>
-        </div>
-        
-        <div class="flex flex-col items-end">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Time</span>
-            <button (click)="sudokuService.isPaused.set(true)" class="text-slate-400 hover:text-slate-900" aria-label="Pause game">
-              <lucide-icon [name]="Pause" size="12"></lucide-icon>
-            </button>
-          </div>
-          <span class="text-2xl font-mono font-bold text-slate-800">{{ formatTime(sudokuService.timer()) }}</span>
-        </div>
-      </div>
+      <app-stats-panel
+        [mistakes]="sudokuService.mistakes()"
+        [timerSeconds]="sudokuService.timer()"
+        (pause)="sudokuService.isPaused.set(true)"
+      />
 
-      <!-- Action Buttons -->
-      <div class="flex justify-between gap-2">
-        <button (click)="sudokuService.undo()" class="action-btn-circle" aria-label="Undo">
-          <lucide-icon [name]="Undo2" size="20"></lucide-icon>
-        </button>
-        <button (click)="sudokuService.setCellValue(sudokuService.selectedCellIndex()!, null)" class="action-btn-circle" aria-label="Erase">
-          <lucide-icon [name]="Eraser" size="20"></lucide-icon>
-        </button>
-        <button 
-          (click)="toggleNoteMode()" 
-          class="action-btn-circle"
-          [class.active]="sudokuService.isNoteMode()"
-          aria-label="Toggle Notes Mode"
-        >
-          <lucide-icon [name]="Pencil" size="20"></lucide-icon>
-        </button>
-        <button (click)="sudokuService.useHint()" class="action-btn-circle relative" aria-label="Get Hint">
-          <lucide-icon [name]="Lightbulb" size="20"></lucide-icon>
-          <span 
-            class="absolute -top-1 -right-1 text-[10px] text-white w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white transition-colors"
-            [class.bg-blue-600]="sudokuService.hintsRemaining() > 0"
-            [class.bg-amber-500]="sudokuService.hintsRemaining() <= 0"
-          >
-            {{ sudokuService.hintsRemaining() > 0 ? sudokuService.hintsRemaining() : '+' }}
-          </span>
-        </button>
-      </div>
+      <app-toolbar
+        [difficulty]="sudokuService.difficulty()"
+        [theme]="sudokuService.theme()"
+        [noteModeActive]="sudokuService.isNoteMode()"
+        [hintsRemaining]="sudokuService.hintsRemaining()"
+        (undo)="sudokuService.undo()"
+        (erase)="sudokuService.setCellValue(sudokuService.selectedCellIndex()!, null)"
+        (toggleNoteMode)="toggleNoteMode()"
+        (requestHint)="sudokuService.useHint()"
+        (requestNewGame)="sudokuService.requestNewGame()"
+        (themeChange)="sudokuService.theme.set($event)"
+      />
 
       <!-- Number Pad -->
-      <div class="flex flex-col gap-3">
-        <div class="flex justify-between items-center">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Input</span>
-          <button (click)="sudokuService.resetGame()" class="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1">
-            <lucide-icon [name]="RotateCcw" size="10"></lucide-icon>
-            Reset Board
-          </button>
-        </div>
-        <div class="grid grid-cols-3 gap-3">
-          @for (n of [1,2,3,4,5,6,7,8,9]; track n) {
-            <button 
-              (click)="sudokuService.setCellValue(sudokuService.selectedCellIndex()!, n)"
-              class="numpad-btn"
-              [disabled]="sudokuService.isNumberComplete(n)"
-            >
-              {{ n }}
-            </button>
-          }
-        </div>
-      </div>
-
-      <!-- New Game Button -->
-      <button (click)="sudokuService.requestNewGame()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all">
-        New Game
-      </button>
-
-      <!-- Theme Selector at the bottom -->
-      <div class="flex justify-center gap-4 pt-4 border-t border-slate-100">
-        @for (t of themes; track t) {
-          <button 
-            (click)="sudokuService.theme.set(t)"
-            [attr.aria-label]="'Switch to ' + t + ' theme'"
-            class="w-8 h-8 rounded-full border-2 transition-all shadow-sm"
-            [style.background-color]="t === 'classic' ? '#ffffff' : t === 'dark' ? '#0f172a' : t === 'ocean' ? '#082f49' : '#f5f2ed'"
-            [class.border-blue-600]="sudokuService.theme() === t"
-            [class.border-slate-200]="sudokuService.theme() !== t"
-          ></button>
-        }
-      </div>
+      <app-number-pad
+        [isNumberComplete]="isNumberComplete"
+        (numberSelect)="onNumberSelect($event)"
+        (resetBoard)="sudokuService.resetGame()"
+      />
 
     </div>
   </div>

@@ -260,16 +260,16 @@ Thin orchestration service.
 
 ## Step 8 — Split Components
 
-**Status:** ⬜ Pending
+**Status:** ✅ Completed
 **Risk:** Medium
 
 ### Components
 
-- [ ] StatsPanel
-- [ ] NumberPad
-- [ ] Toolbar
-- [ ] SudokuBoard
-- [ ] HintModal
+- [x] StatsPanel
+- [x] NumberPad
+- [x] Toolbar
+- [x] SudokuBoard
+- [x] HintModal
 
 ### Deliverable
 

@@ -1,6 +1,9 @@
+import '@angular/compiler';
+import { ɵresolveComponentResources as resolveComponentResources } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import { JSDOM } from 'jsdom';
+import { readFile } from 'node:fs/promises';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './app';
 import { AnalyticsService } from './services/analytics.service';
@@ -19,7 +22,7 @@ describe('App characterization', () => {
     trackSessionEnd: ReturnType<typeof vi.fn>;
   };
 
-  beforeAll(() => {
+  beforeAll(async () => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       const dom = new JSDOM('<!doctype html><html><body></body></html>');
       vi.stubGlobal('window', dom.window as unknown as Window);
@@ -37,16 +40,18 @@ describe('App characterization', () => {
       );
     }
 
-      try {
+    try {
       TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting());
     } catch (error: unknown) {
       if (!(error instanceof Error && /already been called/.test(error.message))) {
         throw error;
       }
     }
+
+    await resolveComponentResources((url) => readFile(new URL(url, import.meta.url), 'utf8'));
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.useFakeTimers();
     analyticsMock = {
       trackAppLaunch: vi.fn(),
@@ -58,7 +63,8 @@ describe('App characterization', () => {
       trackSessionEnd: vi.fn()
     };
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
+      imports: [App],
       providers: [
         SudokuService,
         StorageService,
@@ -67,7 +73,7 @@ describe('App characterization', () => {
           useValue: analyticsMock
         }
       ],
-    });
+    }).compileComponents();
 
     TestBed.runInInjectionContext(() => {
       app = new App();
@@ -87,6 +93,19 @@ describe('App characterization', () => {
 
   it('starts and renders an 81-cell puzzle', () => {
     expect(app.sudokuService.board()).toHaveLength(81);
+  });
+
+  it('composes the extracted game UI components', () => {
+    const fixture = TestBed.createComponent(App);
+
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.querySelector('app-stats-panel')).not.toBeNull();
+    expect(element.querySelector('app-toolbar')).not.toBeNull();
+    expect(element.querySelector('app-number-pad')).not.toBeNull();
+    expect(element.querySelector('app-sudoku-board')).not.toBeNull();
+    expect(element.querySelectorAll('.sudoku-cell')).toHaveLength(81);
   });
 
   it('handles number, erase and note-mode keyboard controls', () => {
