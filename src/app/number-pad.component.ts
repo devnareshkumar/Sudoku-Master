@@ -8,6 +8,7 @@ import { LucideAngularModule, RotateCcw } from 'lucide-angular';
   imports: [CommonModule, LucideAngularModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
+  styleUrl: './number-pad.component.css',
   template: `
     <div class="flex flex-col gap-3">
       <div class="flex justify-between items-center">

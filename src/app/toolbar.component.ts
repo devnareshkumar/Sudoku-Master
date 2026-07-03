@@ -9,6 +9,7 @@ import type { Difficulty } from './models/game-state';
   imports: [CommonModule, LucideAngularModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
+  styleUrl: './toolbar.component.css',
   template: `
     @if (showDifficultySelector) {
       <div class="w-full max-w-5xl flex justify-start sm:justify-center gap-2 sm:gap-8 mb-8 sm:mb-12 border-b border-slate-100 pb-4 overflow-x-auto no-scrollbar px-2">

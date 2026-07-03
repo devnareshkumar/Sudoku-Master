@@ -1,0 +1,53 @@
+.numpad-btn {
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  color: #1e40af;
+  display: flex;
+  font-family: var(--font-mono);
+  font-size: 1.875rem;
+  font-weight: 500;
+  justify-content: center;
+  line-height: 2.25rem;
+  transition-property: all;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.numpad-btn:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.numpad-btn:active {
+  transform: scale(0.9);
+}
+
+.numpad-btn:disabled {
+  opacity: 0.3;
+}
+
+@media (min-width: 640px) {
+  .numpad-btn {
+    font-size: 2.25rem;
+    line-height: 2.5rem;
+  }
+}
+
+.numpad-btn.complete {
+  background-color: rgb(16 185 129 / 0.1);
+  border-color: rgb(16 185 129 / 0.2);
+  color: #10b981;
+}
+
+.numpad-btn.complete:hover {
+  background-color: #10b981;
+  color: white;
+}
+
+:host-context([data-theme='dark']) .numpad-btn {
+  color: #60a5fa;
+}

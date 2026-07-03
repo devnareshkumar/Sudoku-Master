@@ -9,6 +9,7 @@ import type { SudokuCell } from './models/game-state';
   imports: [CommonModule, LucideAngularModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
+  styleUrl: './sudoku-board.component.css',
   template: `
     <div class="sudoku-grid shadow-2xl rounded-sm overflow-hidden bg-white">
       @for (cell of cells; track $index) {
