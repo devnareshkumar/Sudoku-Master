@@ -9,7 +9,11 @@
   />
 
   <!-- Main content: board + side controls -->
-  <div class="w-full max-w-7xl flex-1 flex flex-col lg:flex-row gap-6 lg:gap-12 justify-center items-center lg:items-start px-4 lg:px-8">
+  <div
+  class="w-full max-w-7xl px-4 pb-4 lg:px-8
+         fixed inset-x-0 bottom-0 bg-white/95 border-t border-app-line shadow-xl
+         lg:static lg:bg-transparent lg:border-0 lg:shadow-none lg:pb-8"
+  style="padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));">
     
     <!-- Left Side: Board -->
     <div class="relative flex-none w-full max-w-[450px] lg:max-w-[700px] px-2 sm:px-0">
