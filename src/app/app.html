@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-white p-4 lg:p-8 flex flex-col items-center font-sans text-slate-900">
+<div class="min-h-screen bg-white flex flex-col items-center font-sans text-slate-900">
   
   <!-- Top Difficulty Selector -->
   <app-toolbar
@@ -8,7 +8,8 @@
     (difficultyChange)="sudokuService.requestNewGame($event)"
   />
 
-  <div class="w-full max-w-7xl flex flex-col lg:flex-row gap-8 lg:gap-24 justify-center items-center lg:items-start">
+  <!-- Main content: board + side controls -->
+  <div class="w-full max-w-7xl flex-1 flex flex-col lg:flex-row gap-6 lg:gap-12 justify-center items-center lg:items-start px-4 lg:px-8">
     
     <!-- Left Side: Board -->
     <div class="relative flex-none w-full max-w-[450px] lg:max-w-[700px] px-2 sm:px-0">
@@ -34,8 +35,8 @@
       />
     </div>
 
-    <!-- Right Side: Controls -->
-    <div class="flex-none w-full max-w-[450px] lg:w-80 flex flex-col gap-6 sm:gap-8 px-2 sm:px-0">
+    <!-- Right Side: Stats + Controls (no number pad here on mobile) -->
+    <div class="flex-none w-full max-w-[450px] lg:w-80 flex flex-col gap-4 sm:gap-6 px-2 sm:px-0">
       
       <app-stats-panel
         [mistakes]="sudokuService.mistakes()"
@@ -43,27 +44,42 @@
         (pause)="sudokuService.isPaused.set(true)"
       />
 
-      <app-toolbar
-        [difficulty]="sudokuService.difficulty()"
-        [theme]="sudokuService.theme()"
-        [noteModeActive]="sudokuService.isNoteMode()"
-        [hintsRemaining]="sudokuService.hintsRemaining()"
-        (undo)="sudokuService.undo()"
-        (erase)="sudokuService.setCellValue(sudokuService.selectedCellIndex()!, null)"
-        (toggleNoteMode)="toggleNoteMode()"
-        (requestHint)="sudokuService.useHint()"
-        (requestNewGame)="sudokuService.requestNewGame()"
-        (themeChange)="sudokuService.theme.set($event)"
-      />
+      <div class="bg-app-surface rounded-2xl shadow-md border border-app-line p-4 flex flex-col gap-3">
+        <app-toolbar
+          [difficulty]="sudokuService.difficulty()"
+          [theme]="sudokuService.theme()"
+          [noteModeActive]="sudokuService.isNoteMode()"
+          [hintsRemaining]="sudokuService.hintsRemaining()"
+          (undo)="sudokuService.undo()"
+          (erase)="sudokuService.setCellValue(sudokuService.selectedCellIndex()!, null)"
+          (toggleNoteMode)="toggleNoteMode()"
+          (requestHint)="sudokuService.useHint()"
+          (requestNewGame)="sudokuService.requestNewGame()"
+          (themeChange)="sudokuService.theme.set($event)"
+        />
 
-      <!-- Number Pad -->
-      <app-number-pad
-        [isNumberComplete]="isNumberComplete"
-        (numberSelect)="onNumberSelect($event)"
-        (resetBoard)="sudokuService.resetGame()"
-      />
-
+        <!-- Optional large New Game button for mobile focus -->
+        <button
+          class="mt-1 w-full py-3 rounded-2xl bg-app-accent text-white font-bold text-base shadow-lg hover:bg-app-accent-dark active:scale-95 transition"
+          (click)="sudokuService.requestNewGame()"
+        >
+          New Game
+        </button>
+      </div>
     </div>
+  </div>
+
+  <!-- Bottom Number Pad: single row, sticky on mobile, static on desktop -->
+  <div
+    class="w-full max-w-7xl px-4 pb-4 lg:px-8
+           fixed inset-x-0 bottom-0 bg-white/95 border-t border-app-line shadow-xl
+           lg:static lg:bg-transparent lg:border-0 lg:shadow-none lg:pb-8"
+  >
+    <app-number-pad
+      [isNumberComplete]="isNumberComplete"
+      (numberSelect)="onNumberSelect($event)"
+      (resetBoard)="sudokuService.resetGame()"
+    />
   </div>
 </div>
 @if (showSettings()) {
