@@ -87,7 +87,7 @@ export class ToolbarComponent {
   @Output() erase = new EventEmitter<void>();
   @Output() toggleNoteMode = new EventEmitter<void>();
   @Output() requestHint = new EventEmitter<void>();
-  @Output() requestNewGame = new EventEmitter<void>();
+  @Output() requestNewGame = new EventEmitter<Difficulty>();
   @Output() themeChange = new EventEmitter<string>();
 
   readonly Undo2 = Undo2;
