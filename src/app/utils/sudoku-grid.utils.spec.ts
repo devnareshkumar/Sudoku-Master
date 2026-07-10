@@ -22,7 +22,7 @@ describe('sudoku-grid utilities', () => {
   });
 
   it('detects candidate numbers by scanning row, column and box conflicts', () => {
-    const board: SudokuCell[] = Array.from({ length: 81 }, (_, index) => ({
+    const board: SudokuCell[] = Array.from({ length: 81 }, () => ({
       value: null,
       solution: 0,
       initial: false,

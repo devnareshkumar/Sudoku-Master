@@ -19,7 +19,7 @@
       <app-stats-panel
         [mistakes]="sudokuService.mistakes()"
         [timerSeconds]="sudokuService.timer()"
-        (pause)="sudokuService.isPaused.set(true)"
+        (pauseGame)="sudokuService.isPaused.set(true)"
       />
     </section>
 
@@ -34,7 +34,7 @@
           [isPaused]="sudokuService.isPaused()"
           [cellClass]="getBoardCellClass"
           (cellSelect)="sudokuService.selectedCellIndex.set($event)"
-          (resume)="sudokuService.isPaused.set(false)"
+          (resumeGame)="sudokuService.isPaused.set(false)"
         />
 
         <app-hint-modal

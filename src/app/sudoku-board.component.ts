@@ -42,7 +42,7 @@ import type { SudokuCell } from './models/game-state';
 
     @if (isPaused) {
       <div class="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-20">
-        <button (click)="resume.emit()" class="p-6 bg-blue-600 text-white rounded-full shadow-xl hover:scale-110 transition-transform">
+        <button (click)="resumeGame.emit()" class="p-6 bg-blue-600 text-white rounded-full shadow-xl hover:scale-110 transition-transform">
           <lucide-icon [name]="Play" size="48"></lucide-icon>
         </button>
         <p class="mt-4 font-bold text-xl text-slate-800">Paused</p>
@@ -59,7 +59,7 @@ export class SudokuBoardComponent {
   @Input() isPaused = false;
   @Input() cellClass: ((index: number) => string) | null = null;
   @Output() cellSelect = new EventEmitter<number>();
-  @Output() resume = new EventEmitter<void>();
+  @Output() resumeGame = new EventEmitter<void>();
 
   readonly Play = Play;
 }

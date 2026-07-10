@@ -17,22 +17,23 @@ import { LucideAngularModule, Pause } from 'lucide-angular';
         </div>
       </div>
 
-      <div class="flex flex-col items-end">
-        <div class="flex items-center gap-2 mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Time</span>
-          <button (click)="pause.emit()" class="text-slate-400 hover:text-slate-900" aria-label="Pause game">
-            <lucide-icon [name]="Pause" size="12"></lucide-icon>
-          </button>
-        </div>
-        <span class="text-2xl font-mono font-bold text-slate-800">{{ formatTime(timerSeconds) }}</span>
+      <div class="flex justify-between items-center py-1">
+        <span class="text-xs text-slate-400 font-semibold">
+          Mistakes: <b class="text-slate-700 font-mono">{{ mistakes }}/3</b>
+        </span>
+      <div class="flex items-center gap-2">
+        <button (click)="pauseGame.emit()" class="text-slate-400 hover:text-slate-900" aria-label="Pause game">
+          <lucide-icon [name]="Pause" size="14"></lucide-icon>
+        </button>
+        <span class="text-base font-mono font-bold text-slate-800">{{ formatTime(timerSeconds) }}</span>
       </div>
-    </div>
+  </div>
   `
 })
 export class StatsPanelComponent {
   @Input() mistakes = 0;
   @Input() timerSeconds = 0;
-  @Output() pause = new EventEmitter<void>();
+  @Output() pauseGame = new EventEmitter<void>();
 
   readonly Pause = Pause;
 

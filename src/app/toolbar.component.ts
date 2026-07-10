@@ -28,50 +28,51 @@ import type { Difficulty } from './models/game-state';
     }
 
     @if (showGameControls) {
-      <div class="flex justify-between gap-2">
+    <div class="toolbar-compact flex items-center justify-between gap-2">
+      <div class="flex gap-1.5">
         <button (click)="undo.emit()" class="action-btn-circle" aria-label="Undo">
-          <lucide-icon [name]="Undo2" size="20"></lucide-icon>
+          <lucide-icon [name]="Undo2" size="18"></lucide-icon>
         </button>
         <button (click)="erase.emit()" class="action-btn-circle" aria-label="Erase">
-          <lucide-icon [name]="Eraser" size="20"></lucide-icon>
+          <lucide-icon [name]="Eraser" size="18"></lucide-icon>
         </button>
-        <button
-          (click)="toggleNoteMode.emit()"
-          class="action-btn-circle"
-          [class.active]="noteModeActive"
-          aria-label="Toggle Notes Mode"
-        >
-          <lucide-icon [name]="Pencil" size="20"></lucide-icon>
+        <button (click)="toggleNoteMode.emit()" class="action-btn-circle" [class.active]="noteModeActive" aria-label="Toggle Notes">
+          <lucide-icon [name]="Pencil" size="18"></lucide-icon>
         </button>
         <button (click)="requestHint.emit()" class="action-btn-circle relative" aria-label="Get Hint">
-          <lucide-icon [name]="Lightbulb" size="20"></lucide-icon>
-          <span
-            class="absolute -top-1 -right-1 text-[10px] text-white w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white transition-colors"
-            [class.bg-blue-600]="hintsRemaining > 0"
-            [class.bg-amber-500]="hintsRemaining <= 0"
-          >
+          <lucide-icon [name]="Lightbulb" size="18"></lucide-icon>
+          <span class="absolute -top-1 -right-1 text-[9px] text-white w-4 h-4 rounded-full flex items-center justify-center font-bold border-2 border-white"
+                [class.bg-blue-600]="hintsRemaining > 0" [class.bg-amber-500]="hintsRemaining <= 0">
             {{ hintsRemaining > 0 ? hintsRemaining : '+' }}
           </span>
         </button>
       </div>
 
-      <button (click)="requestNewGame.emit()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all">
-        New Game
+      <button (click)="requestNewGame.emit(difficulty)" class="new-game-btn" aria-label="New Game">
+        New
       </button>
 
-      <div class="flex justify-center gap-4 pt-4 border-t border-slate-100">
-        @for (t of themes; track t) {
-          <button
-            (click)="themeChange.emit(t)"
-            [attr.aria-label]="'Switch to ' + t + ' theme'"
-            class="w-8 h-8 rounded-full border-2 transition-all shadow-sm"
-            [style.background-color]="t === 'classic' ? '#ffffff' : t === 'dark' ? '#0f172a' : t === 'ocean' ? '#082f49' : '#f5f2ed'"
-            [class.border-blue-600]="theme === t"
-            [class.border-slate-200]="theme !== t"
-          ></button>
+      <div class="theme-trigger-wrap">
+        <button class="theme-swatch" [style.background-color]="themeColor(theme)"
+                (click)="themeMenuOpen = !themeMenuOpen" aria-label="Change theme">
+          <span class="sr-only">Change theme</span>
+        </button>
+        @if (themeMenuOpen) {
+          <div class="theme-popover">
+            @for (t of themes; track t) {
+              <button class="w-7 h-7 rounded-full border-2 shadow-sm"
+                      [style.background-color]="themeColor(t)"
+                      [class.border-blue-600]="theme === t" [class.border-slate-200]="theme !== t"
+                      [attr.aria-label]="'Switch to ' + t + ' theme'"
+                      (click)="themeChange.emit(t); themeMenuOpen = false">
+                <span class="sr-only">{{ t }}</span>
+              </button>
+            }
+          </div>
         }
       </div>
-    }
+    </div>
+  }
   `
 })
 export class ToolbarComponent {
@@ -96,4 +97,10 @@ export class ToolbarComponent {
   readonly Lightbulb = Lightbulb;
   readonly difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'expert'];
   readonly themes = ['classic', 'dark', 'ocean', 'sepia'];
+
+    themeMenuOpen = false;
+
+  themeColor(t: string): string {
+    return t === 'classic' ? '#ffffff' : t === 'dark' ? '#0f172a' : t === 'ocean' ? '#082f49' : '#f5f2ed';
+  }
 }

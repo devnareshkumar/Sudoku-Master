@@ -47,9 +47,9 @@ describe('extracted presentational components', () => {
     const resume = vi.fn();
 
     component.cellSelect.subscribe(cellSelect);
-    component.resume.subscribe(resume);
+    component.resumeGame.subscribe(resume);
     component.cellSelect.emit(40);
-    component.resume.emit();
+    component.resumeGame.emit();
 
     expect(cellSelect).toHaveBeenCalledWith(40);
     expect(resume).toHaveBeenCalledOnce();

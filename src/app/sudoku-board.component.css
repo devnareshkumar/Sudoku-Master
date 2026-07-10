@@ -1,20 +1,17 @@
 .sudoku-grid {
-  display: grid;
+display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
   aspect-ratio: 1 / 1;
   border: 2px solid #1e293b;
-  width: 100%;
-  max-width: min(100vw - 2rem, 450px);
+  width: min(100cqw, 100cqh, 450px);
   margin: 0 auto;
   background-color: var(--surface);
   user-select: none;
 }
 
 @media (min-width: 1024px) {
-  .sudoku-grid {
-    max-width: 700px;
-  }
+  .sudoku-grid { width: min(100cqw, 100cqh, 700px); }
 }
 
 .sudoku-cell {

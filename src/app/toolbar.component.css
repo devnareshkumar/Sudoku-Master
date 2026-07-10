@@ -1,39 +1,39 @@
-.action-btn-circle {
-  align-items: center;
-  background-color: #f1f5f9;
-  border-radius: 9999px;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  color: #475569;
+.toolbar-compact { position: relative; }
+
+.new-game-btn {
   display: flex;
-  height: 2.5rem;
-  justify-content: center;
-  transition-property: all;
-  transition-duration: 150ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  width: 2.5rem;
-}
-
-.action-btn-circle:hover {
-  background-color: #e2e8f0;
-}
-
-.action-btn-circle:active {
-  transform: scale(0.9);
-}
-
-.action-btn-circle:disabled {
-  opacity: 0.3;
-}
-
-@media (min-width: 640px) {
-  .action-btn-circle {
-    height: 3rem;
-    width: 3rem;
-  }
-}
-
-.action-btn-circle.active {
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
   background-color: #2563eb;
-  box-shadow: 0 10px 15px -3px rgb(37 99 235 / 0.2), 0 4px 6px -4px rgb(37 99 235 / 0.2);
   color: white;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 6px -1px rgb(37 99 235 / 0.3);
+  white-space: nowrap;
+}
+.new-game-btn:active { transform: scale(0.95); }
+
+.theme-trigger-wrap { position: relative; }
+
+.theme-swatch {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  border: 2px solid #2563eb;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+}
+
+.theme-popover {
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.2);
+  z-index: 30;
 }
