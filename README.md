@@ -1,20 +1,36 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Sudoku Master
 
-# Run and deploy your AI Studio app
+A modern, high-performance, interactive Sudoku application built with Angular. Designed with a modular architecture, this project delivers a seamless client-side puzzle-solving experience complete with analytics, progress tracking, dynamic hint generations, and responsive controls.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/7dd1fbab-93a3-4f97-8d37-3a8ccb990cd2
+## 🚀 Features
 
-## Run Locally
+- **Interactive Sudoku Grid**: Clean, highly responsive standalone component grid with immediate feedback on conflicts.
+- **Smart Hint System**: Dynamic mathematical evaluation providing contextual cell hints when stuck.
+- **State Persistence**: Automated local storage service integration ensuring game progress is never lost on refresh.
+- **Performance Analytics & Statistics**: Track solve rates, times, and completion metrics natively.
+- **Modern Tech Stack**: Scaffolded with standalone components, clean utility layers, and highly maintainable UI modules.
 
-**Prerequisites:**  Node.js
+---
 
+## 🛠️ Tech Stack & Architecture
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **Framework**: Angular (Standalone Architecture)
+- **Styling**: PostCSS / Tailwind CSS setup for responsive rendering
+- **State & Services**: Decoupled domain models (`game-state`, `user-state`) managed via clean Angular Services
+- **Testing**: Vitest for rapid, lightweight unit test execution
+
+---
+
+## 📦 Getting Started
+
+### Prerequisites
+- **Node.js**: `^18.x` or higher
+- **npm**: `^9.x` or higher
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/devnareshkumar/Sudoku-Master.git](https://github.com/devnareshkumar/Sudoku-Master.git)
+   cd Sudoku-Master
