@@ -1,10 +1,17 @@
 .sudoku-grid {
-display: grid;
+  display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
   aspect-ratio: 1 / 1;
   border: 2px solid #1e293b;
-  width: min(100cqw, 100cqh, 450px);
+
+  /* --- NEW FIX --- */
+  width: 100%;
+  max-width: min(100%, 450px, 60vh);
+  height: auto;
+  flex-shrink: 0; 
+  /* --------------- */
+
   margin: 0 auto;
   background-color: var(--surface);
   user-select: none;
