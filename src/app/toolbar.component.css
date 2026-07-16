@@ -4,8 +4,9 @@
   flex-direction: column;
   width: 100%;
   align-items: center;
-  margin-top: 0.5rem; /* Reduced space now that the grid shadow is gone */
-  margin-bottom: 0.5rem; 
+  /* Shrinks the margin safely when the screen height gets small */
+  margin-top: clamp(0.25rem, 2dvh, 1.5rem); 
+  margin-bottom: clamp(0.25rem, 1dvh, 0.5rem); 
 }
 
 .top-row {
@@ -19,7 +20,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem; /* Keeps a good gap for finger tapping */
+  /* Squashes the gap between icons on narrow screens */
+  gap: clamp(1rem, 5vw, 2.5rem); 
   width: 100%;
 }
 

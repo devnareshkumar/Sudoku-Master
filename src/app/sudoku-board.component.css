@@ -9,11 +9,18 @@
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
   aspect-ratio: 1 / 1;
-  border: 2px solid var(--ink); /* Matches theme */
-  width: 100%;
-  max-width: min(100%, 500px, 65vh);
-  height: auto;
-  flex-shrink: 0;
+  border: 2px solid var(--ink);
+
+  /* Fluid Sizing */
+  width: 100cqmin;
+  height: 100cqmin;
+  max-width: 500px;
+  max-height: 500px;
+  
+  /* FIX: Absolute minimum size to prevent the grid from crushing itself */
+  min-width: 320px;
+  min-height: 320px;
+
   margin: 0 auto;
   background-color: var(--surface);
   box-shadow: none !important;
@@ -27,10 +34,13 @@
   cursor: pointer;
   position: relative;
   font-family: var(--font-mono);
-  font-size: 1.25rem;
+  
+  /* FLUID FONTS: The numbers scale exactly with the grid size automatically! */
+  font-size: clamp(1rem, 7cqmin, 2.5rem); 
+  
   transition: background-color 0.25s ease-out, color 0.2s ease-out;
   background-color: var(--surface);
-  color: var(--accent); /* User numbers match theme accent */
+  color: var(--accent);
   box-shadow: inset 0 0 0 0.5px var(--line);
   outline: none;
 }
@@ -118,7 +128,7 @@
 }
 
 .note-digit {
-  font-size: 0.6rem;
+  font-size: clamp(0.5rem, 2cqmin, 0.85rem); /* Shrinks nicely for tiny screens */
   display: flex;
   align-items: center;
   justify-content: center;

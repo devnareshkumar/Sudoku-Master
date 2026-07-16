@@ -14,14 +14,14 @@
   flex: 1;
   align-items: center;
   justify-content: center;
-  min-height: 64px; 
+  min-height: clamp(40px, 8dvh, 64px); 
   background: transparent;
   border: none;
   border-right: 1px solid var(--line); /* Creates the vertical divider line */
   border-radius: 0; /* Ensures inner buttons have perfectly straight edges */
   color: var(--ink); 
   font-family: var(--font-mono);
-  font-size: 2.25rem; 
+  font-size: clamp(1.5rem, 4dvh, 2.25rem); 
   font-weight: 500;
   transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease-out, opacity 0.3s ease;
   cursor: pointer;
