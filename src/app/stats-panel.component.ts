@@ -22,17 +22,22 @@ import type { Difficulty } from './models/game-state';
       <!-- BOTTOM ROW: Difficulty, Mistakes, Controls -->
       <div class="flex items-center justify-between w-full">
         
-        <!-- Left: Difficulty Dropdown (Tightly packed) -->
+        <!-- Left: Difficulty Dropdown (Overlay Trick) -->
         <div class="flex flex-col">
           <span class="text-[0.65rem] font-bold tracking-widest uppercase opacity-50 text-app-ink">Difficulty</span>
-          <div class="relative w-max flex items-center">
-            <select [value]="difficulty" (change)="onDifficultyChange($event)" class="appearance-none bg-transparent font-bold text-app-ink opacity-80 text-base pr-4 focus:outline-none cursor-pointer">
+          <div class="relative flex items-center cursor-pointer">
+            <!-- Visual display that shrinks perfectly to the exact word length -->
+            <div class="flex items-center gap-1 font-bold text-app-ink opacity-80 text-base pointer-events-none capitalize">
+              {{ difficulty }}
+              <lucide-icon [name]="ChevronDown" [size]="16" class="opacity-50 mt-0.5"></lucide-icon>
+            </div>
+            <!-- Invisible actual select box overlaying the text -->
+            <select [value]="difficulty" (change)="onDifficultyChange($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
               <option value="expert">Expert</option>
             </select>
-            <lucide-icon [name]="ChevronDown" [size]="14" class="absolute right-0 opacity-50 pointer-events-none"></lucide-icon>
           </div>
         </div>
 

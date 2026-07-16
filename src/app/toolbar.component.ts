@@ -15,16 +15,16 @@ import type { Difficulty } from './models/game-state';
       @if (showGameControls) {
         <div class="action-buttons-row">
           <button class="action-btn" (click)="undo.emit()">
-            <lucide-icon [name]="Undo2"></lucide-icon>
+            <lucide-icon [name]="Undo2" [size]="30"></lucide-icon>
           </button>
           <button class="action-btn" (click)="erase.emit()">
-            <lucide-icon [name]="Eraser"></lucide-icon>
+            <lucide-icon [name]="Eraser" [size]="30"></lucide-icon>
           </button>
           <button class="action-btn" [class.active]="noteModeActive" (click)="toggleNoteMode.emit()">
-            <lucide-icon [name]="Pencil"></lucide-icon>
+            <lucide-icon [name]="Pencil" [size]="30"></lucide-icon>
           </button>
           <button class="action-btn hint-btn" (click)="requestHint.emit()">
-            <lucide-icon [name]="Lightbulb"></lucide-icon>
+            <lucide-icon [name]="Lightbulb" [size]="30"></lucide-icon>
             <span class="hint-badge">{{ hintsRemaining > 0 ? hintsRemaining : '+' }}</span>
           </button>
         </div>
