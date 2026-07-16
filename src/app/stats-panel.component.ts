@@ -9,12 +9,24 @@ import type { Difficulty } from './models/game-state';
   imports: [CommonModule, LucideAngularModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
+  styles: [`
+    /* Custom bounce for the difficulty wrapper */
+    .ios-dropdown {
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s ease-out;
+      -webkit-tap-highlight-color: transparent;
+      transform-origin: left center; /* Anchors the squish to the left side */
+    }
+    .ios-dropdown:active {
+      transform: scale(0.92);
+      opacity: 0.6;
+    }
+  `],
   template: `
     <div class="flex flex-col w-full px-2 mb-1 gap-3">
       
-      <!-- TOP ROW: New Game Button (Aligned Right) -->
+      <!-- TOP ROW: New Game Button (Cleaned up tailwind classes to inherit global CSS) -->
       <div class="flex justify-end w-full mt-1">
-        <button (click)="newGame.emit()" class="px-6 py-1.5 bg-app-accent text-white rounded-full text-sm font-bold uppercase tracking-widest shadow-md active:scale-95 transition-all">
+        <button (click)="newGame.emit()" class="px-6 py-1.5 bg-app-accent text-white rounded-full text-sm font-bold uppercase tracking-widest shadow-md">
           New Game
         </button>
       </div>
@@ -22,16 +34,14 @@ import type { Difficulty } from './models/game-state';
       <!-- BOTTOM ROW: Difficulty, Mistakes, Controls -->
       <div class="flex items-center justify-between w-full">
         
-        <!-- Left: Difficulty Dropdown (Overlay Trick) -->
+        <!-- Left: Difficulty Dropdown (Now animated) -->
         <div class="flex flex-col">
           <span class="text-[0.65rem] font-bold tracking-widest uppercase opacity-50 text-app-ink">Difficulty</span>
-          <div class="relative flex items-center cursor-pointer">
-            <!-- Visual display that shrinks perfectly to the exact word length -->
+          <div class="relative w-max flex items-center cursor-pointer ios-dropdown">
             <div class="flex items-center gap-1 font-bold text-app-ink opacity-80 text-base pointer-events-none capitalize">
               {{ difficulty }}
               <lucide-icon [name]="ChevronDown" [size]="16" class="opacity-50 mt-0.5"></lucide-icon>
             </div>
-            <!-- Invisible actual select box overlaying the text -->
             <select [value]="difficulty" (change)="onDifficultyChange($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
@@ -48,13 +58,13 @@ import type { Difficulty } from './models/game-state';
         </div>
 
         <!-- Right: Controls -->
-        <div class="flex items-center gap-3 mt-3">
-          <button (click)="resetGame.emit()" class="opacity-50 hover:opacity-100 transition-opacity text-app-ink flex items-center" title="Reset Board">
-            <lucide-icon [name]="RotateCcw" [size]="20"></lucide-icon>
+        <div class="flex items-center gap-4 mt-3">
+          <button (click)="resetGame.emit()" class="opacity-60 hover:opacity-100 text-app-ink flex items-center" title="Reset Board">
+            <lucide-icon [name]="RotateCcw" [size]="22"></lucide-icon>
           </button>
           
-          <button (click)="pauseGame.emit()" class="opacity-50 hover:opacity-100 transition-opacity text-app-ink flex items-center" title="Pause Game">
-            <lucide-icon [name]="Pause" [size]="20"></lucide-icon>
+          <button (click)="pauseGame.emit()" class="opacity-60 hover:opacity-100 text-app-ink flex items-center" title="Pause Game">
+            <lucide-icon [name]="Pause" [size]="22"></lucide-icon>
           </button>
           
           <span class="font-mono text-xl font-bold tracking-widest text-app-ink opacity-80">{{ formatTime(timerSeconds) }}</span>

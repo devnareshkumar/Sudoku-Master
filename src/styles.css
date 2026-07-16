@@ -25,7 +25,16 @@
 }
 
 :root {
-  /* Classic Theme */
+  /* Sepia Theme (Now Default) */
+  --bg: #f5f2ed;
+  --surface: #fffcf8;
+  --ink: #433422;
+  --line: #e3dcd2;
+  --accent: #92400e;
+  --highlight: #fef3c7;
+}
+
+[data-theme='classic'] {
   --bg: #ffffff;
   --surface: #ffffff;
   --ink: #0f172a;
@@ -97,4 +106,19 @@ app-hint-modal > div,
     margin-right: auto !important;
     box-sizing: border-box !important;
     overflow-wrap: break-word !important;
+}
+
+/* Global Apple-Style Button Animations */
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Apply the springy transition to all buttons EXCEPT the ones we already styled separately */
+button:not(.numpad-btn):not(.action-btn) {
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.15s ease-out, background-color 0.15s ease-out !important;
+}
+
+/* Add the squish effect on press */
+button:not(.numpad-btn):not(.action-btn):active {
+  transform: scale(0.92) !important;
 }

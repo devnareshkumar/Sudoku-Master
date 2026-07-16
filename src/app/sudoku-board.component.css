@@ -1,23 +1,23 @@
+@keyframes successFlash {
+  0% { background-color: var(--surface); }
+  40% { background-color: color-mix(in srgb, var(--color-app-success) 45%, transparent); }
+  100% { background-color: color-mix(in srgb, var(--color-app-success) 15%, transparent); }
+}
+
 .sudoku-grid {
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   grid-template-rows: repeat(9, 1fr);
   aspect-ratio: 1 / 1;
-  border: 2px solid #1e293b;
-
+  border: 2px solid var(--ink); /* Matches theme */
   width: 100%;
-  max-width: min(100%, 500px, 65vh); /* Increased from 50vh to 65vh */
+  max-width: min(100%, 500px, 65vh);
   height: auto;
   flex-shrink: 0;
-
   margin: 0 auto;
   background-color: var(--surface);
+  box-shadow: none !important;
   user-select: none;
-  
-}
-
-@media (min-width: 1024px) {
-  .sudoku-grid { width: min(100cqw, 100cqh, 700px); }
 }
 
 .sudoku-cell {
@@ -28,22 +28,19 @@
   position: relative;
   font-family: var(--font-mono);
   font-size: 1.25rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.25s ease-out, color 0.2s ease-out;
   background-color: var(--surface);
-  color: #1e40af;
+  color: var(--accent); /* User numbers match theme accent */
   box-shadow: inset 0 0 0 0.5px var(--line);
+  outline: none;
 }
 
 @media (min-width: 640px) {
-  .sudoku-cell {
-    font-size: 1.75rem;
-  }
+  .sudoku-cell { font-size: 1.75rem; }
 }
 
 @media (min-width: 1024px) {
-  .sudoku-cell {
-    font-size: 3rem;
-  }
+  .sudoku-cell { font-size: 3rem; }
 }
 
 .sudoku-cell::after {
@@ -58,7 +55,7 @@
   right: -1px;
   bottom: 0;
   width: 2px;
-  background-color: #1e293b;
+  background-color: var(--ink); /* 3x3 box borders match theme */
 }
 
 .sudoku-cell:nth-child(n+19):nth-child(-n+27)::before,
@@ -69,57 +66,47 @@
   left: 0;
   right: 0;
   height: 2px;
-  background-color: #1e293b;
+  background-color: var(--ink); /* 3x3 box borders match theme */
   z-index: 5;
   pointer-events: none;
 }
 
 .sudoku-cell.selected {
   background-color: var(--accent) !important;
-  color: white !important;
-  z-index: 20;
+  color: var(--surface) !important;  
 }
 
 .sudoku-cell.highlighted {
-  background-color: color-mix(in srgb, var(--accent), transparent 90%);
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 .sudoku-cell.same-number {
-  background-color: color-mix(in srgb, var(--accent), transparent 75%);
+  background-color: color-mix(in srgb, var(--accent) 30%, transparent);
   font-weight: bold;
 }
 
 .sudoku-cell.box-complete {
-  background-color: #f0fdf4;
+  animation: successFlash 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .sudoku-cell.hint-target {
-  background-color: #22c55e !important;
+  background-color: var(--color-app-success) !important;
   color: white !important;
-  z-index: 30;
 }
 
 .sudoku-cell.hint-conflict {
-  background-color: #fee2e2 !important;
-  color: #ef4444 !important;
-}
-
-:host-context([data-theme='dark']) .sudoku-cell.box-complete {
-  background-color: #064e3b;
+  background-color: color-mix(in srgb, var(--color-app-error) 20%, transparent) !important;
+  color: var(--color-app-error) !important;
 }
 
 .sudoku-cell.error {
-  color: #ef4444 !important;
-  background-color: #fef2f2;
+  color: var(--color-app-error) !important;
+  background-color: color-mix(in srgb, var(--color-app-error) 10%, transparent);
 }
 
 .sudoku-cell.initial {
   font-weight: 700;
-  color: #0f172a;
-}
-
-:host-context([data-theme='dark']) .sudoku-cell.initial {
-  color: #f8fafc;
+  color: var(--ink); /* Initial numbers match theme */
 }
 
 .notes-grid {
@@ -139,7 +126,5 @@
 }
 
 @media (min-width: 1024px) {
-  .note-digit {
-    font-size: 0.875rem;
-  }
+  .note-digit { font-size: 0.875rem; }
 }

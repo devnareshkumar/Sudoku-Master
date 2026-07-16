@@ -23,7 +23,7 @@
   font-family: var(--font-mono);
   font-size: 2.25rem; 
   font-weight: 500;
-  transition: background-color 0.15s ease-out; /* Removed scaling so the bar doesn't break when tapped */
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.15s ease-out, opacity 0.3s ease;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent; 
 }
@@ -35,6 +35,7 @@
 
 /* Fills the specific segment with a slight shade when tapped */
 .numpad-btn:active {
+  transform: scale(0.96); /* A very gentle iOS-style tap squish */
   background-color: color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
@@ -44,8 +45,8 @@
 
 /* When a number is fully placed 9 times on the board */
 .numpad-btn.complete {
-  opacity: 0.15; 
-  pointer-events: none; 
+  color: color-mix(in srgb, var(--ink) 15%, transparent); 
+  pointer-events: none;
 }
 
 /* Larger screens */
