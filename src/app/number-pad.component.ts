@@ -10,30 +10,12 @@ import { LucideAngularModule, RotateCcw } from 'lucide-angular';
   host: { class: 'contents' },
   styleUrl: './number-pad.component.css',
   template: `
-    <div class="flex flex-col gap-2">
-      <div class="flex justify-between items-center">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Input</span>
-        <button
-          (click)="resetBoard.emit()"
-          class="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-700 flex items-center gap-1"
-        >
-          <lucide-icon [name]="RotateCcw" size="10"></lucide-icon>
-          Reset Board
+    <div class="number-pad-row">
+      @for (n of [1,2,3,4,5,6,7,8,9]; track n) {
+        <button class="numpad-btn" [class.complete]="isNumberComplete(n)" (click)="numberSelect.emit(n)">
+          {{ n }}
         </button>
-      </div>
-
-      <!-- Single-row number pad -->
-      <div class="number-pad-row">
-        @for (n of [1,2,3,4,5,6,7,8,9]; track n) {
-          <button
-            (click)="numberSelect.emit(n)"
-            class="numpad-btn"
-            [disabled]="isNumberComplete(n)"
-          >
-            {{ n }}
-          </button>
-        }
-      </div>
+      }
     </div>
   `
 })

@@ -17,6 +17,8 @@ export class SudokuService {
   // Private writable backing signals
   private readonly _board = signal<SudokuCell[]>([]);
   private readonly _difficulty = signal<Difficulty>('easy');
+  private readonly _puzzleString = signal<string>('');
+  private readonly _solutionString = signal<string>('');
   private readonly _selectedCellIndex = signal<number | null>(null);
   private readonly _mistakes = signal<number>(0);
   private readonly _isNoteMode = signal<boolean>(false);
@@ -170,14 +172,46 @@ export class SudokuService {
 
   initializeGame() {
     const savedGame = this.storage.loadGame();
+
     if (!savedGame) {
       this.newGame(this.difficulty());
       return false;
     }
 
-    this.newGame(savedGame.difficulty);
+    if (this.hasPersistedPuzzle(savedGame)) {
+      this._puzzleString.set(savedGame.puzzleString);
+      this._solutionString.set(savedGame.solutionString);
+      this.difficulty.set(savedGame.difficulty);
+      this.board.set(this.createBoardFromPuzzle(savedGame.puzzleString, savedGame.solutionString));
+    } else {
+      this.newGame(savedGame.difficulty);
+    }
+
     this.applyPersistedGameState(savedGame);
     return true;
+  }
+
+  private hasPersistedPuzzle(
+    state: PersistedGameState
+  ): state is PersistedGameState & { puzzleString: string; solutionString: string } {
+    return state.puzzleString?.length === 81 && state.solutionString?.length === 81;
+  }
+
+  private createBoardFromPuzzle(puzzleString: string, solutionString: string): SudokuCell[] {
+    const board: SudokuCell[] = [];
+
+    for (let i = 0; i < 81; i++) {
+      const value = puzzleString[i] === '-' ? null : Number(puzzleString[i]);
+      board.push({
+        value,
+        solution: Number(solutionString[i]),
+        initial: value !== null,
+        notes: new Set(),
+        error: false
+      });
+    }
+
+    return board;
   }
 
   requestNewGame(diff: Difficulty = this.difficulty()) {
@@ -227,6 +261,10 @@ export class SudokuService {
     this.analytics.trackPuzzleStart(diff);
     const puzzle = getSudoku(diff);
 
+    // Save the generated strings so they can be saved to local storage
+    this._puzzleString.set(puzzle.puzzle);
+    this._solutionString.set(puzzle.solution);
+
     const newBoard: SudokuCell[] = [];
     for (let i = 0; i < 81; i++) {
       const val = puzzle.puzzle[i] === '-' ? null : parseInt(puzzle.puzzle[i]);
@@ -238,7 +276,6 @@ export class SudokuService {
         error: false
       });
     }
-
     this.board.set(newBoard);
     this.mistakes.set(0);
     this.timer.set(0);
@@ -464,6 +501,8 @@ export class SudokuService {
 
   private toPersistedState(): PersistedGameState {
     return {
+      puzzleString: this._puzzleString(),
+      solutionString: this._solutionString(),
       board: this.board().map((cell) => ({
         value: cell.value,
         notes: Array.from(cell.notes),

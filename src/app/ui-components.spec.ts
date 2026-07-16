@@ -7,10 +7,21 @@ import { SudokuBoardComponent } from './sudoku-board.component';
 import { ToolbarComponent } from './toolbar.component';
 
 describe('extracted presentational components', () => {
-  it('formats stats time without service access', () => {
+it('formats stats time without service access', () => {
     const component = new StatsPanelComponent();
-
     expect(component.formatTime(125)).toBe('2:05');
+  });
+
+  it('emits difficulty change intent from stats panel', () => {
+    const component = new StatsPanelComponent();
+    const difficultyChange = vi.fn();
+    component.difficultyChange.subscribe(difficultyChange);
+    
+    // Simulate a user selecting 'hard' from the dropdown
+    const mockEvent = { target: { value: 'hard' } } as unknown as Event;
+    component.onDifficultyChange(mockEvent);
+    
+    expect(difficultyChange).toHaveBeenCalledWith('hard');
   });
 
   it('emits toolbar user intents', () => {

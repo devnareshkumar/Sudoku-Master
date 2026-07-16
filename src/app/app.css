@@ -41,3 +41,9 @@
   justify-content: center;
   position: relative;
 }
+
+/* Magically re-order the layout for Mobile */
+.stats-section { order: 1; }
+.board-section { order: 2; margin-top: 0; margin-bottom: 0; }
+.top-controls { order: 3; } /* Moves action buttons below the board */
+.number-pad-section { order: 4; padding-bottom: 1rem; }

@@ -17,10 +17,15 @@
 
     <section class="stats-section" aria-label="Game status">
       <app-stats-panel
-        [mistakes]="sudokuService.mistakes()"
-        [timerSeconds]="sudokuService.timer()"
-        (pauseGame)="sudokuService.isPaused.set(true)"
-      />
+        class="stats-section"
+          [mistakes]="sudokuService.mistakes()"
+          [timerSeconds]="sudokuService.timer()"
+          [difficulty]="sudokuService.difficulty()"
+          (pauseGame)="sudokuService.isPaused.set(true)"
+          (newGame)="sudokuService.requestNewGame()"
+          (resetGame)="sudokuService.resetGame()"
+          (difficultyChange)="sudokuService.requestNewGame($event)">
+      </app-stats-panel>
     </section>
 
     <section class="board-section" aria-label="Sudoku board">

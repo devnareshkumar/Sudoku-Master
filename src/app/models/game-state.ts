@@ -38,6 +38,8 @@ export interface PersistedSudokuCell {
 }
 
 export interface PersistedGameState {
+  puzzleString?: string;
+  solutionString?: string;
   board: PersistedSudokuCell[];
   difficulty: Difficulty;
   selectedCellIndex: number | null;

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Pause } from 'lucide-angular';
+import { LucideAngularModule, Pause, RotateCcw, ChevronDown } from 'lucide-angular';
+import type { Difficulty } from './models/game-state';
 
 @Component({
   selector: 'app-stats-panel',
@@ -9,37 +10,76 @@ import { LucideAngularModule, Pause } from 'lucide-angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
   template: `
-    <div class="flex justify-between items-end border-b border-slate-100 pb-4">
-      <div class="flex flex-col">
-        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Mistakes</span>
-        <div class="px-3 py-1 bg-slate-50 rounded border border-slate-200 font-mono font-bold text-lg">
-          {{ mistakes }}/3
-        </div>
+    <div class="flex flex-col w-full px-2 mb-1 gap-3">
+      
+      <!-- TOP ROW: New Game Button (Aligned Right) -->
+      <div class="flex justify-end w-full mt-1">
+        <button (click)="newGame.emit()" class="px-6 py-1.5 bg-app-accent text-white rounded-full text-sm font-bold uppercase tracking-widest shadow-md active:scale-95 transition-all">
+          New Game
+        </button>
       </div>
 
-      <div class="flex justify-between items-center py-1">
-        <span class="text-xs text-slate-400 font-semibold">
-          Mistakes: <b class="text-slate-700 font-mono">{{ mistakes }}/3</b>
-        </span>
-      <div class="flex items-center gap-2">
-        <button (click)="pauseGame.emit()" class="text-slate-400 hover:text-slate-900" aria-label="Pause game">
-          <lucide-icon [name]="Pause" size="14"></lucide-icon>
-        </button>
-        <span class="text-base font-mono font-bold text-slate-800">{{ formatTime(timerSeconds) }}</span>
+      <!-- BOTTOM ROW: Difficulty, Mistakes, Controls -->
+      <div class="flex items-center justify-between w-full">
+        
+        <!-- Left: Difficulty Dropdown (Tightly packed) -->
+        <div class="flex flex-col">
+          <span class="text-[0.65rem] font-bold tracking-widest uppercase opacity-50 text-app-ink">Difficulty</span>
+          <div class="relative w-max flex items-center">
+            <select [value]="difficulty" (change)="onDifficultyChange($event)" class="appearance-none bg-transparent font-bold text-app-ink opacity-80 text-base pr-4 focus:outline-none cursor-pointer">
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+              <option value="expert">Expert</option>
+            </select>
+            <lucide-icon [name]="ChevronDown" [size]="14" class="absolute right-0 opacity-50 pointer-events-none"></lucide-icon>
+          </div>
+        </div>
+
+        <!-- Middle: Mistakes -->
+        <div class="flex flex-col items-center">
+          <span class="text-[0.65rem] font-bold tracking-widest uppercase opacity-50 text-app-ink">Mistakes</span>
+          <span class="font-mono text-lg font-bold text-app-ink opacity-80">{{ mistakes }}/3</span>
+        </div>
+
+        <!-- Right: Controls -->
+        <div class="flex items-center gap-3 mt-3">
+          <button (click)="resetGame.emit()" class="opacity-50 hover:opacity-100 transition-opacity text-app-ink flex items-center" title="Reset Board">
+            <lucide-icon [name]="RotateCcw" [size]="20"></lucide-icon>
+          </button>
+          
+          <button (click)="pauseGame.emit()" class="opacity-50 hover:opacity-100 transition-opacity text-app-ink flex items-center" title="Pause Game">
+            <lucide-icon [name]="Pause" [size]="20"></lucide-icon>
+          </button>
+          
+          <span class="font-mono text-xl font-bold tracking-widest text-app-ink opacity-80">{{ formatTime(timerSeconds) }}</span>
+        </div>
+
       </div>
-  </div>
+    </div>
   `
 })
 export class StatsPanelComponent {
   @Input() mistakes = 0;
   @Input() timerSeconds = 0;
+  @Input() difficulty: Difficulty = 'easy';
   @Output() pauseGame = new EventEmitter<void>();
-
+  @Output() newGame = new EventEmitter<void>();
+  @Output() resetGame = new EventEmitter<void>();
+  @Output() difficultyChange = new EventEmitter<Difficulty>();
+  
   readonly Pause = Pause;
+  readonly RotateCcw = RotateCcw;
+  readonly ChevronDown = ChevronDown;
 
   formatTime(seconds: number): string {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  onDifficultyChange(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    this.difficultyChange.emit(select.value as Difficulty);
   }
 }
