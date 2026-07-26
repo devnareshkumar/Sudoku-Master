@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Pause, RotateCcw, ChevronDown } from 'lucide-angular';
+import { LucideAngularModule, Pause, RotateCcw, ChevronDown, Check } from 'lucide-angular';
 import type { Difficulty } from './models/game-state';
 
 @Component({
@@ -34,21 +34,47 @@ import type { Difficulty } from './models/game-state';
       <!-- BOTTOM ROW: Difficulty, Mistakes, Controls -->
       <div class="flex items-center justify-between w-full">
         
-        <!-- Left: Difficulty Dropdown (Now animated) -->
-        <div class="flex flex-col">
+        <!-- Left: Difficulty Dropdown (custom menu, own trigger + panel) -->
+        <div class="flex flex-col relative difficulty-dropdown-root">
           <span class="text-[0.65rem] font-bold tracking-widest uppercase opacity-50 text-app-ink">Difficulty</span>
-          <div class="relative w-max flex items-center cursor-pointer ios-dropdown">
-            <div class="flex items-center gap-1 font-bold text-app-ink opacity-80 text-base pointer-events-none capitalize">
-              {{ difficulty }}
-              <lucide-icon [name]="ChevronDown" [size]="16" class="opacity-50 mt-0.5"></lucide-icon>
+          <button
+            type="button"
+            class="flex items-center gap-1 font-bold text-app-ink opacity-80 text-base capitalize ios-dropdown"
+            [attr.aria-expanded]="difficultyMenuOpen"
+            aria-haspopup="listbox"
+            (click)="toggleDifficultyMenu()"
+          >
+            {{ difficulty }}
+            <lucide-icon
+              [name]="ChevronDown"
+              [size]="16"
+              class="opacity-50 mt-0.5 transition-transform duration-150"
+              [class.rotate-180]="difficultyMenuOpen"
+            ></lucide-icon>
+          </button>
+
+          @if (difficultyMenuOpen) {
+            <div
+              role="listbox"
+              class="absolute left-0 top-full mt-1 z-20 w-36 rounded-2xl bg-app-surface border border-app-line shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+            >
+              @for (d of difficulties; track d) {
+                <button
+                  type="button"
+                  role="option"
+                  [attr.aria-selected]="d === difficulty"
+                  class="flex items-center justify-between w-full px-3 py-2 text-sm font-semibold capitalize text-app-ink hover:bg-app-bg transition-colors"
+                  [class.bg-app-bg]="d === difficulty"
+                  (click)="selectDifficulty(d)"
+                >
+                  {{ d }}
+                  @if (d === difficulty) {
+                    <lucide-icon [name]="Check" [size]="14" class="opacity-70"></lucide-icon>
+                  }
+                </button>
+              }
             </div>
-            <select [value]="difficulty" (change)="onDifficultyChange($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-              <option value="expert">Expert</option>
-            </select>
-          </div>
+          }
         </div>
 
         <!-- Middle: Mistakes -->
@@ -86,6 +112,10 @@ export class StatsPanelComponent {
   readonly Pause = Pause;
   readonly RotateCcw = RotateCcw;
   readonly ChevronDown = ChevronDown;
+  readonly Check = Check;
+  readonly difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'expert'];
+
+  difficultyMenuOpen = false;
 
   formatTime(seconds: number): string {
     const mins = Math.floor(seconds / 60);
@@ -93,8 +123,27 @@ export class StatsPanelComponent {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
-  onDifficultyChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    this.difficultyChange.emit(select.value as Difficulty);
+  toggleDifficultyMenu() {
+    this.difficultyMenuOpen = !this.difficultyMenuOpen;
+  }
+
+  selectDifficulty(d: Difficulty) {
+    this.difficultyMenuOpen = false;
+    if (d !== this.difficulty) {
+      this.difficultyChange.emit(d);
+    }
+  }
+
+  @HostListener('document:click', ['$event.target'])
+  onDocumentClick(target: EventTarget | null) {
+    const el = target as HTMLElement | null;
+    if (this.difficultyMenuOpen && !el?.closest?.('.difficulty-dropdown-root')) {
+      this.difficultyMenuOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    this.difficultyMenuOpen = false;
   }
 }

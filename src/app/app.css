@@ -46,6 +46,7 @@ height: 100dvh;
   flex: 1 0 100%;
   min-height: 550px; 
   gap: 0.375rem;
+  justify-content: center; /* Any leftover height now settles at the very top/bottom of the shell, not around the board */
 }
 
 .top-controls,
@@ -55,8 +56,10 @@ height: 100dvh;
 }
 
 .board-section {
-  flex: 1 1 0%; /* The '0%' is critical! It allows the section to shrink below its content size */
+  flex: 0 1 auto; /* Only take as much height as the square grid actually needs — don't stretch to fill leftover space */
+  aspect-ratio: 1 / 1; /* Self-size to a square based on available width, instead of being centered inside an oversized box */
   min-height: 320px;
+  max-height: 62dvh; /* Safety cap for unusually tall/narrow viewports */
   display: flex;
   align-items: center;
   justify-content: center;
