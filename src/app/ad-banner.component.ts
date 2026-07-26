@@ -19,7 +19,7 @@ interface WindowWithAdSense extends Window {
   `
 })
 export class AdBannerComponent implements AfterViewInit {
-  @Input() client = 'ca-pub-0000000000000000'; // Your Publisher ID
+  @Input() client = 'ca-pub-2439025898081807'; // Your Publisher ID
   @Input() slot = '0000000000'; // Your Ad Unit ID
 
   private platformId = inject(PLATFORM_ID);

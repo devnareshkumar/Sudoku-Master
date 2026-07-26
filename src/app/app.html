@@ -200,17 +200,22 @@
 
 <!-- Ad Watching Overlay -->
 @if (sudokuService.isWatchingAd()) {
-  <div class="fixed inset-0 bg-black/95 backdrop-blur-xl z-[80] flex items-center justify-center p-4">
-    <div class="text-center text-white">
-      <div class="w-20 h-20 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-6"></div>
-      <h3 class="text-2xl font-bold mb-2">Watching Ad...</h3>
-      <p class="text-white/50">Your hint is being prepared</p>
-      
-      <div class="mt-12 p-6 bg-white/5 rounded-3xl border border-white/10 max-w-xs mx-auto">
-        <p class="text-sm italic text-white/80">"Sudoku Master Edition: The ultimate brain training experience."</p>
-      </div>
-      
-      <p class="mt-8 text-xs uppercase tracking-widest text-white/30">Advertisement</p>
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in">
+    <div class="bg-app-surface border border-app-line rounded-3xl p-6 shadow-2xl max-w-sm w-full text-center flex flex-col items-center">
+        
+        <h2 class="text-xl font-bold text-app-ink mb-2 tracking-tight">Unlocking Hint...</h2>
+        <p class="text-app-ink opacity-70 mb-4 text-sm">Please wait a moment to support Sudoku Studio.</p>
+        
+        <!-- Google Ad Container -->
+        <div class="w-[300px] h-[250px] bg-app-line/30 rounded-xl flex items-center justify-center overflow-hidden mb-6">
+            <app-ad-banner slot="YOUR_AD_SLOT_ID"></app-ad-banner>
+        </div>
+
+        <!-- 10-Second CSS Progress Bar -->
+        <div class="w-full h-1.5 bg-app-line rounded-full overflow-hidden">
+            <div class="h-full bg-app-accent origin-left animate-progress"></div>
+        </div>
+        
     </div>
   </div>
 }
