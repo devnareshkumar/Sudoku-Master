@@ -31,21 +31,30 @@ import type { Difficulty } from './models/game-state';
       opacity: 0.8;
     }
   `],
-  template: `
-    <div class="flex flex-col w-full gap-3 px-2 mb-4">
+template: `
+    <div class="flex flex-col w-full gap-4 px-2 mb-4">
       
-      <!-- Top Row: New Game Button (Aligned Right) -->
-      <div class="flex justify-end w-full">
+      <!-- Top Row: Logo & New Game Button -->
+      <div class="flex justify-between items-center w-full mt-3">
+        
+        <!-- SudokuStudio Link -->
+        <a href="https://sudokustudio.org" 
+           class="font-extrabold text-app-ink text-xl tracking-tight hover:opacity-70 transition-opacity select-none">
+          SudokuStudio
+        </a>
+
+        <!-- New Game Button -->
         <button class="new-game-btn bg-app-accent text-app-surface px-6 py-2.5 rounded-full font-bold uppercase tracking-widest text-[0.7rem] shadow-sm cursor-pointer"
                 (click)="newGame.emit()">
           New Game
         </button>
+
       </div>
 
       <!-- Bottom Row: Stats -->
       <div class="flex justify-between items-end w-full">
         
-        <!-- Difficulty Dropdown (Restored) -->
+        <!-- Difficulty Dropdown -->
         <div class="flex flex-col gap-1">
           <span class="text-[0.65rem] font-bold text-app-ink opacity-50 uppercase tracking-widest">Difficulty</span>
           <div class="relative ios-dropdown flex items-center">
