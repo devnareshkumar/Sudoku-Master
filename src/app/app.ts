@@ -31,6 +31,7 @@ import { NumberPadComponent } from './number-pad.component';
 import { SudokuBoardComponent } from './sudoku-board.component';
 import { HintModalComponent } from './hint-modal.component';
 import { AboutComponent } from './about.component';
+import { AdBannerComponent } from './ad-banner.component';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
@@ -43,7 +44,8 @@ import { AboutComponent } from './about.component';
     NumberPadComponent,
     SudokuBoardComponent,
     HintModalComponent,
-    AboutComponent
+    AboutComponent,
+    AdBannerComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

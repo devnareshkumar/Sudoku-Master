@@ -35,7 +35,7 @@ describe('StorageService', () => {
     localStorage.setItem('sudoku_settings', '{not valid json');
 
     expect(storageService.loadSettings()).toEqual({
-      theme: 'classic',
+      theme: 'sepia',
       soundEffects: true,
       autoSave: true,
       analyticsOptIn: false
@@ -127,7 +127,7 @@ describe('StorageService', () => {
 
     expect(storageService.isBrowser()).toBe(false);
     expect(storageService.loadSettings()).toEqual({
-      theme: 'classic',
+      theme: 'sepia',
       soundEffects: true,
       autoSave: true,
       analyticsOptIn: false

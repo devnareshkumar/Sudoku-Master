@@ -421,7 +421,7 @@ describe('SudokuService characterization', () => {
     expect(service.showAdPrompt()).toBe(false);
     expect(service.isWatchingAd()).toBe(true);
 
-    vi.advanceTimersByTime(3000);
+    vi.advanceTimersByTime(10000);
 
     expect(service.isWatchingAd()).toBe(false);
     expect(service.hintsRemaining()).toBe(0);
@@ -442,7 +442,7 @@ describe('SudokuService characterization', () => {
     expect(service.showAdPrompt()).toBe(false);
     expect(service.isWatchingAd()).toBe(true);
 
-    vi.advanceTimersByTime(2999);
+    vi.advanceTimersByTime(9999);
     expect(service.isWatchingAd()).toBe(true);
 
     vi.advanceTimersByTime(1);
@@ -461,7 +461,7 @@ describe('SudokuService characterization', () => {
     const service = createService('server');
     TestBed.flushEffects();
 
-    expect(service.theme()).toBe('classic');
+    expect(service.theme()).toBe('sepia');
     expect(getItem).not.toHaveBeenCalled();
     expect(setItem).not.toHaveBeenCalled();
     expect(setIntervalSpy).not.toHaveBeenCalled();

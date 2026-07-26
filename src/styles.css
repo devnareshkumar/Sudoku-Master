@@ -122,3 +122,12 @@ button:not(.numpad-btn):not(.action-btn) {
 button:not(.numpad-btn):not(.action-btn):active {
   transform: scale(0.92) !important;
 }
+
+@keyframes progress {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.animate-progress {
+  animation: progress 10s linear forwards;
+}

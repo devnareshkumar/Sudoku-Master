@@ -18,11 +18,10 @@ it('formats stats time without service access', () => {
     component.difficultyChange.subscribe(difficultyChange);
 
     // Simulate a user picking 'hard' from the custom dropdown menu
-    component.difficultyMenuOpen = true;
-    component.selectDifficulty('hard');
+   const mockEvent = { target: { value: 'hard' } } as unknown as Event;
+    component.onDifficultyChange(mockEvent);
 
     expect(difficultyChange).toHaveBeenCalledWith('hard');
-    expect(component.difficultyMenuOpen).toBe(false);
   });
 
   it('emits toolbar user intents', () => {

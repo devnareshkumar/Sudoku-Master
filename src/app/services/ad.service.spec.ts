@@ -99,7 +99,7 @@ describe('AdService', () => {
     expect(service.canShowInterstitial(false)).toBe(false);
   });
 
-  it('should simulate rewarded ad for 3 seconds and grant one hint credit', () => {
+it('should simulate rewarded ad for 10 seconds and grant one hint credit', () => { // <-- Rename test
     const onComplete = vi.fn();
     const analyticsSpy = vi.spyOn(AnalyticsService.prototype, 'trackRewardedAdStarted');
     const completedSpy = vi.spyOn(AnalyticsService.prototype, 'trackRewardedAdCompleted');
@@ -112,12 +112,14 @@ describe('AdService', () => {
     expect(service.rewardedHintCredits()).toBe(0);
     expect(onComplete).not.toHaveBeenCalled();
 
-    vi.advanceTimersByTime(2999);
+    vi.advanceTimersByTime(9999); // <-- Update from 2999
+    
     expect(service.isWatchingAd()).toBe(true);
     expect(service.rewardedHintCredits()).toBe(0);
     expect(onComplete).not.toHaveBeenCalled();
 
     vi.advanceTimersByTime(1);
+    
     expect(service.isWatchingAd()).toBe(false);
     expect(service.rewardedHintCredits()).toBe(1);
     expect(onComplete).toHaveBeenCalledTimes(1);
@@ -134,13 +136,12 @@ describe('AdService', () => {
     expect(analyticsSpy).toHaveBeenCalledWith('hint_gate');
   });
 
-  it('should ignore duplicate rewarded ad requests while already watching', () => {
+it('should ignore duplicate rewarded ad requests while already watching', () => {
     const onComplete = vi.fn();
-
     service.watchRewardedAd(onComplete);
     service.watchRewardedAd(onComplete);
 
-    vi.advanceTimersByTime(3000);
+    vi.advanceTimersByTime(10000); // <-- Update from 3000
 
     expect(service.rewardedHintCredits()).toBe(1);
     expect(onComplete).toHaveBeenCalledTimes(1);

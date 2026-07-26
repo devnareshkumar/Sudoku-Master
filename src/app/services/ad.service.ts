@@ -91,21 +91,21 @@ export class AdService {
     this.rewardedHintCredits.set(0);
   }
 
-  watchRewardedAd(onComplete: () => void): void {
+watchRewardedAd(onComplete: () => void): void {
     if (this.isWatchingAd()) {
       return;
     }
-
+    
     this.isWatchingAd.set(true);
     this.showAdPrompt.set(false);
     this.analytics.trackRewardedAdStarted('hint_gate');
 
+    // Wait 10 seconds (10000ms) before granting the hint credit
     setTimeout(() => {
       this.isWatchingAd.set(false);
       this.grantRewardedHintCredit();
       this.analytics.trackRewardedAdCompleted('hint_gate');
-
       onComplete();
-    }, 3000);
+    }, 10000); 
   }
 }
