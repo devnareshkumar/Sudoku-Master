@@ -42,11 +42,11 @@ import type { Difficulty } from './models/game-state';
               {{ difficulty }}
               <lucide-icon [name]="ChevronDown" [size]="16" class="opacity-50 mt-0.5"></lucide-icon>
             </div>
-            <select [value]="difficulty" (change)="onDifficultyChange($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-              <option value="expert">Expert</option>
+            <select (change)="onDifficultyChange($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <option value="easy"   [selected]="difficulty === 'easy'">Easy</option>
+              <option value="medium" [selected]="difficulty === 'medium'">Medium</option>
+              <option value="hard"   [selected]="difficulty === 'hard'">Hard</option>
+              <option value="expert" [selected]="difficulty === 'expert'">Expert</option>
             </select>
           </div>
         </div>
