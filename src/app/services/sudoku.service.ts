@@ -47,7 +47,7 @@ export class SudokuService {
   });
 
   // Theme
-  private readonly _theme = signal<string>('classic');
+  private readonly _theme = signal<string>('sepia');
 
   // Readonly exposure for UI consumers
   readonly boardSignal = this._board.asReadonly();

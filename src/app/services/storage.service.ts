@@ -204,7 +204,7 @@ export class StorageService {
 
   private defaultSettings(): UserSettings {
     return {
-      theme: 'classic',
+      theme: 'sepia',
       soundEffects: true,
       autoSave: true,
       analyticsOptIn: false

@@ -1,4 +1,16 @@
-<div class="game-page">
+<div class="hidden md:flex flex-col items-center justify-center h-[100dvh] w-full px-6 text-center animate-in fade-in zoom-in">
+  <lucide-angular [img]="Brain" class="w-20 h-20 text-app-accent mb-6"></lucide-angular>
+  <h1 class="text-3xl font-bold text-app-ink mb-4 tracking-tight">
+    Mobile Experience Only
+  </h1>
+  <p class="text-lg text-app-ink opacity-80 max-w-md mx-auto leading-relaxed">
+    Sudoku Studio is currently optimized exclusively for mobile devices. We are actively working on a dedicated desktop web interface! 
+    <br><br>
+    For now, please open this application on your smartphone to play.
+  </p>
+</div>
+
+<div class="game-page md:!hidden">
   <main class="game-shell">
     <section class="top-controls" aria-label="Game controls">
       <app-toolbar
