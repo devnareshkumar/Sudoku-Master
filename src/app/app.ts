@@ -30,7 +30,7 @@ import { ToolbarComponent } from './toolbar.component';
 import { NumberPadComponent } from './number-pad.component';
 import { SudokuBoardComponent } from './sudoku-board.component';
 import { HintModalComponent } from './hint-modal.component';
-
+import { AboutComponent } from './about.component';
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
@@ -42,7 +42,8 @@ import { HintModalComponent } from './hint-modal.component';
     ToolbarComponent,
     NumberPadComponent,
     SudokuBoardComponent,
-    HintModalComponent
+    HintModalComponent,
+    AboutComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
