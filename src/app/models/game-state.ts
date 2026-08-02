@@ -15,6 +15,7 @@ export interface GameStats {
   gamesWon: number;
   gamesPlayed: number;
   currentStreak: number;
+  totalScore: number;
 }
 
 export interface HintDetails {
@@ -49,4 +50,5 @@ export interface PersistedGameState {
   gameStatus: GameStatus;
   timer: number;
   hintsRemaining: number;
+  score: number;
 }

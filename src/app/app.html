@@ -28,16 +28,17 @@
     </section>
 
     <section class="stats-section" aria-label="Game status">
-      <app-stats-panel
-        class="stats-section"
-          [mistakes]="sudokuService.mistakes()"
-          [timerSeconds]="sudokuService.timer()"
-          [difficulty]="sudokuService.difficulty()"
-          (pauseGame)="sudokuService.isPaused.set(true)"
-          (newGame)="sudokuService.requestNewGame()"
-          (resetGame)="sudokuService.resetGame()"
-          (difficultyChange)="sudokuService.requestNewGame($event)">
-      </app-stats-panel>
+        <app-stats-panel
+            class="stats-section block w-full px-4 sm:px-6"
+            [mistakes]="sudokuService.mistakes()"
+            [timerSeconds]="sudokuService.timer()"
+            [difficulty]="sudokuService.difficulty()"
+            [score]="sudokuService.score()" 
+            (pauseGame)="sudokuService.isPaused.set(true)"
+            (newGame)="sudokuService.requestNewGame()"
+            (resetGame)="sudokuService.resetGame()"
+            (difficultyChange)="sudokuService.requestNewGame($event)">
+        </app-stats-panel>
     </section>
 
     <section class="board-section" aria-label="Sudoku board">
@@ -50,6 +51,7 @@
           [showHintModal]="sudokuService.showHintModal()"
           [isPaused]="sudokuService.isPaused()"
           [cellClass]="getBoardCellClass"
+          [floatingTexts]="sudokuService.floatingTexts()"
           (cellSelect)="sudokuService.selectedCellIndex.set($event)"
           (resumeGame)="sudokuService.isPaused.set(false)"
         />

@@ -21,6 +21,11 @@ import type { SudokuCell } from './models/game-state';
           tabindex="0"
           role="button"
         >
+          
+          @for (fp of getFloatingPointsForCell($index); track fp.id) {
+            <span class="floating-point">{{ fp.text }}</span>
+        }
+
           @if (cell.value !== null) {
             {{ cell.value }}
           } @else {
@@ -58,8 +63,14 @@ export class SudokuBoardComponent {
   @Input() showHintModal = false;
   @Input() isPaused = false;
   @Input() cellClass: ((index: number) => string) | null = null;
+  @Input() floatingTexts: {index: number, text: string, id: number}[] = [];
   @Output() cellSelect = new EventEmitter<number>();
   @Output() resumeGame = new EventEmitter<void>();
 
   readonly Play = Play;
+
+  getFloatingPointsForCell(index: number) {
+    return this.floatingTexts.filter(pt => pt.index === index);
+  }
 }
+

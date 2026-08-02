@@ -6,7 +6,7 @@ import { AnalyticsService } from './analytics.service';
 import { StorageService } from './storage.service';
 import { AdService } from './ad.service';
 import { PremiumService } from './premium.service';
-import { getCandidateNumbers, getCellConflicts, getCellLocation, getRelatedIndices as getRelatedIndicesForCell, isBoardSolved, isBoxComplete, isRowComplete, isColComplete } from '../utils/sudoku-grid.utils';
+import { getCandidateNumbers, getCellConflicts, getCellLocation, getRelatedIndices as getRelatedIndicesForCell, isBoardSolved, isBoxComplete, isRowComplete, isColComplete, getBoxIndices, getRowIndices, getColIndices } from '../utils/sudoku-grid.utils';
 
 export type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from '../models/game-state';
 
@@ -26,6 +26,8 @@ export class SudokuService {
   private readonly _gameStatus = signal<GameStatus>('playing');
   private readonly _timer = signal<number>(0);
   private readonly _hintsRemaining = signal<number>(4);
+  private readonly _score = signal(0);
+  private readonly _floatingTexts = signal<{index: number, text: string, id: number}[]>([]);
 
   // Hint Modal State
   private readonly _showHintModal = signal<boolean>(false);
@@ -43,7 +45,8 @@ export class SudokuService {
     bestTimes: { easy: null, medium: null, hard: null, expert: null },
     gamesWon: 0,
     gamesPlayed: 0,
-    currentStreak: 0
+    currentStreak: 0,
+    totalScore: 0
   });
 
   // Theme
@@ -66,6 +69,8 @@ export class SudokuService {
   readonly pendingDifficultySignal = this._pendingDifficulty.asReadonly();
   readonly statsSignal = this._stats.asReadonly();
   readonly themeSignal = this._theme.asReadonly();
+  readonly scoreSignal = this._score.asReadonly();
+  readonly floatingTextsSignal = this._floatingTexts.asReadonly();
 
   // Compatibility getters for existing consumers and templates
   get board(): WritableSignal<SudokuCell[]> { return this._board; }
@@ -84,6 +89,8 @@ export class SudokuService {
   get pendingDifficulty(): WritableSignal<Difficulty | null> { return this._pendingDifficulty; }
   get stats(): WritableSignal<GameStats> { return this._stats; }
   get theme(): WritableSignal<string> { return this._theme; }
+  get score(): WritableSignal<number> { return this._score; }
+  get floatingTexts() { return this._floatingTexts; }
 
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
@@ -223,6 +230,23 @@ export class SudokuService {
     }
   }
 
+  triggerFloatingPoints(indices: number[], text: string) {
+    if (!this.isBrowser) return;
+    
+    const newPoints = indices.map((index, i) => ({
+      index,
+      text,
+      id: Date.now() + Math.random() + i // Generate unique ID for the DOM track
+    }));
+
+    this._floatingTexts.update(curr => [...curr, ...newPoints]);
+
+    // Remove the points from the DOM after 1 second
+    setTimeout(() => {
+      this._floatingTexts.update(curr => curr.filter(p => !newPoints.includes(p)));
+    }, 1000);
+  }
+
   confirmNewGame() {
     const diff = this.pendingDifficulty();
     if (diff) {
@@ -254,12 +278,14 @@ export class SudokuService {
     this.gameStatus.set('playing');
     this.history = [];
     this.saveHistory();
+    this.score.set(0);
   }
 
   newGame(diff: Difficulty = this.difficulty()) {
     this.difficulty.set(diff);
     this.analytics.trackPuzzleStart(diff);
     const puzzle = getSudoku(diff);
+    this.score.set(0);
 
     // Save the generated strings so they can be saved to local storage
     this._puzzleString.set(puzzle.puzzle);
@@ -287,31 +313,32 @@ export class SudokuService {
   }
 
   private saveHistory() {
-    const state = JSON.stringify(this.board().map(c => ({
-      value: c.value,
-      notes: Array.from(c.notes),
-      error: c.error
-    })));
+    const state = JSON.stringify({
+      score: this.score(),
+      board: this.board().map(c => ({ value: c.value, notes: Array.from(c.notes), error: c.error }))
+    });
     this.history.push(state);
     if (this.history.length > 50) this.history.shift();
   }
 
   undo() {
-    if (this.history.length <= 1) return;
-    this.history.pop();
-    const prevState = JSON.parse(this.history[this.history.length - 1]);
+      if (this.history.length <= 1) return;
+      this.history.pop();
+      const prevState = JSON.parse(this.history[this.history.length - 1]);
+      
+      this.score.set(prevState.score ?? 0); // Restore score
+      
+      this.board.update(current => {
+        return current.map((cell, i) => ({
+          ...cell,
+          value: prevState.board[i].value,
+          notes: new Set(prevState.board[i].notes),
+          error: prevState.board[i].error
+        }));
+      });
+    }
 
-    this.board.update(current => {
-      return current.map((cell, i) => ({
-        ...cell,
-        value: prevState[i].value,
-        notes: new Set(prevState[i].notes),
-        error: prevState[i].error
-      }));
-    });
-  }
-
-  setCellValue(index: number, value: number | null) {
+  setCellValue(index: number, value: number | null, fromHint = false) {
     if (this.gameStatus() !== 'playing') return;
     const cell = this.board()[index];
     if (cell.initial) return;
@@ -320,6 +347,13 @@ export class SudokuService {
       this.toggleNote(index, value);
       return;
     }
+
+    // 1. Take a snapshot of the areas BEFORE the new number is placed
+    const loc = getCellLocation(index);
+    const beforeCorrect = !cell.initial && cell.value === cell.solution;
+    const beforeRow = this.isRowComplete(loc.row);
+    const beforeCol = this.isColComplete(loc.col);
+    const beforeBox = this.isBoxComplete(loc.box);
 
     this.board.update(current => {
       const next = [...current];
@@ -333,19 +367,50 @@ export class SudokuService {
         target.error = value !== target.solution;
         if (target.error) {
           this.mistakes.update(m => m + 1);
-          if (this.mistakes() >= 3) {
-            this.gameStatus.set('lost');
-          }
+          if (this.mistakes() >= 3) this.gameStatus.set('lost');
         }
       }
-
       next[index] = target;
       return next;
     });
 
+    // 2. Take a snapshot AFTER the number is placed
+    const afterCell = this.board()[index];
+    const afterCorrect = !afterCell.initial && afterCell.value === afterCell.solution;
+    const afterRow = this.isRowComplete(loc.row);
+    const afterCol = this.isColComplete(loc.col);
+    const afterBox = this.isBoxComplete(loc.box);
+
+    // 3. Calculate visual multiplier
+    let multiplier = 1;
+    const diff = this.difficulty();
+    if (diff === 'medium') multiplier = 1.5;
+    if (diff === 'hard') multiplier = 2.0;
+    if (diff === 'expert') multiplier = 3.0;
+
+    // 4. Trigger Animations!
+    if (!beforeCorrect && afterCorrect && !fromHint) {
+      this.triggerFloatingPoints([index], `+${10 * multiplier}`);
+    }
+
+    // Use a slight delay stagger if completing multiple things at once (e.g. row AND box)
+    let delay = 0;
+    if (!beforeRow && afterRow) {
+      setTimeout(() => this.triggerFloatingPoints(getRowIndices(loc.row), `+${50 * multiplier}`), delay);
+      delay += 300;
+    }
+    if (!beforeCol && afterCol) {
+      setTimeout(() => this.triggerFloatingPoints(getColIndices(loc.col), `+${50 * multiplier}`), delay);
+      delay += 300;
+    }
+    if (!beforeBox && afterBox) {
+      setTimeout(() => this.triggerFloatingPoints(getBoxIndices(loc.box), `+${50 * multiplier}`), delay);
+    }
+
+    this.recalculateScore(); 
     this.saveHistory();
     this.checkWin();
-  }
+    }
 
   toggleNote(index: number, value: number) {
     this.board.update(current => {
@@ -441,7 +506,7 @@ export class SudokuService {
 
     const isPremium = this.premiumService.isPremium();
 
-    this.setCellValue(hint.index, hint.value);
+    this.setCellValue(hint.index, hint.value, true);
 
     if (!isPremium && this.hintsRemaining() > 0) {
       this.hintsRemaining.update(h => h - 1);
@@ -495,6 +560,7 @@ export class SudokuService {
     this.gameStatus.set(state.gameStatus);
     this.timer.set(state.timer);
     this.hintsRemaining.set(state.hintsRemaining);
+    this.score.set(state.score ?? 0);
     this.history = [];
     this.saveHistory();
   }
@@ -515,7 +581,8 @@ export class SudokuService {
       isPaused: this.isPaused(),
       gameStatus: this.gameStatus(),
       timer: this.timer(),
-      hintsRemaining: this.hintsRemaining()
+      hintsRemaining: this.hintsRemaining(),
+      score: this.score()
     };
   }
 
@@ -523,6 +590,8 @@ export class SudokuService {
     const isComplete = isBoardSolved(this.board());
     if (isComplete) {
       this.gameStatus.set('won');
+      this.awardPoints(500);
+      this.recalculateScore();
       this.analytics.trackPuzzleComplete(
         this.difficulty(),
         this.timer(),
@@ -539,6 +608,7 @@ export class SudokuService {
       next.gamesWon++;
       next.gamesPlayed++;
       next.currentStreak++;
+      next.totalScore = (next.totalScore || 0) + this.score();
 
       const currentBest = next.bestTimes[this.difficulty()];
       if (currentBest === null || this.timer() < currentBest) {
@@ -548,6 +618,53 @@ export class SudokuService {
       return next;
     });
     this.saveStats();
+  }
+
+  private awardPoints(basePoints: number) {
+    if (basePoints === 0) return;
+    
+    let multiplier = 1;
+    const diff = this.difficulty();
+    if (diff === 'medium') multiplier = 1.5;
+    if (diff === 'hard') multiplier = 2.0;
+    if (diff === 'expert') multiplier = 3.0;
+
+    const total = Math.round(basePoints * multiplier);
+    this.score.update(s => s + total); 
+  }
+
+  private recalculateScore() {
+    let currentScore = 0;
+    const board = this.board();
+
+    // 1. Base cell points for correct manual placements
+    board.forEach(cell => {
+      if (!cell.initial && cell.value === cell.solution) {
+        currentScore += 10;
+      }
+    });
+
+    // 2. Area completion points
+    for (let i = 0; i < 9; i++) {
+      if (this.isRowComplete(i)) currentScore += 50;
+      if (this.isColComplete(i)) currentScore += 50;
+      if (this.isBoxComplete(i)) currentScore += 50;
+    }
+
+    // 3. Win Bonus
+    if (isBoardSolved(board)) {
+      currentScore += 500;
+    }
+
+    // 4. Apply Difficulty Multiplier
+    let multiplier = 1;
+    const diff = this.difficulty();
+    if (diff === 'medium') multiplier = 1.5;
+    if (diff === 'hard') multiplier = 2.0;
+    if (diff === 'expert') multiplier = 3.0;
+
+    // 5. Update the score signal
+    this.score.set(Math.round(currentScore * multiplier));
   }
 
   getRelatedIndices(index: number): number[] {

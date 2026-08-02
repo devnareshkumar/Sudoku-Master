@@ -262,7 +262,9 @@ describe('SudokuService characterization', () => {
       gamesWon: 1,
       gamesPlayed: 1,
       currentStreak: 1,
+      totalScore: 2360
     });
+
     const persistedStats = JSON.parse(localStorage.getItem('sudoku-stats') ?? '{}');
     expect(persistedStats).toEqual({
       version: 1,
