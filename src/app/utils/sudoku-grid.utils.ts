@@ -119,3 +119,33 @@ export function isBoxComplete(board: SudokuCell[], boxIndex: number): boolean {
 export function isBoardSolved(board: SudokuCell[]): boolean {
   return board.every((cell) => cell.value === cell.solution);
 }
+
+export function getRowIndices(rowIndex: number): number[] {
+  const indices: number[] = [];
+  for (let i = 0; i < 9; i++) {
+    indices.push(rowIndex * 9 + i);
+  }
+  return indices;
+}
+
+export function getColIndices(colIndex: number): number[] {
+  const indices: number[] = [];
+  for (let i = 0; i < 9; i++) {
+    indices.push(i * 9 + colIndex);
+  }
+  return indices;
+}
+
+export function isRowComplete(board: SudokuCell[], rowIndex: number): boolean {
+  return getRowIndices(rowIndex).every((index) => {
+    const cell = board[index];
+    return cell.value !== null && cell.value === cell.solution;
+  });
+}
+
+export function isColComplete(board: SudokuCell[], colIndex: number): boolean {
+  return getColIndices(colIndex).every((index) => {
+    const cell = board[index];
+    return cell.value !== null && cell.value === cell.solution;
+  });
+}

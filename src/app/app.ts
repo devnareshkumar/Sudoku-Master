@@ -227,17 +227,19 @@ export class App {
     if (cell.error) classes += ' error';
     
     // Box completion highlight
-    const boxRow = Math.floor(Math.floor(index / 9) / 3);
-    const boxCol = Math.floor((index % 9) / 3);
+    const rowIndex = Math.floor(index / 9);
+    const colIndex = index % 9;
+    const boxRow = Math.floor(rowIndex / 3);
+    const boxCol = Math.floor(colIndex / 3);
     const boxIndex = boxRow * 3 + boxCol;
-    if (this.sudokuService.isBoxComplete(boxIndex)) {
-      classes += ' box-complete';
-    }
 
-    if (cell.value !== null && !cell.error && this.sudokuService.isNumberComplete(cell.value)) {
-      classes += ' text-app-success';
+    if (this.sudokuService.isBoxComplete(boxIndex) ||
+      this.sudokuService.isRowComplete(rowIndex) ||
+      this.sudokuService.isColComplete(colIndex)) 
+    {
+      classes += ' area-complete';
     }
-
+    
     return classes;
   }
 

@@ -6,7 +6,7 @@ import { AnalyticsService } from './analytics.service';
 import { StorageService } from './storage.service';
 import { AdService } from './ad.service';
 import { PremiumService } from './premium.service';
-import { getCandidateNumbers, getCellConflicts, getCellLocation, getRelatedIndices as getRelatedIndicesForCell, isBoardSolved, isBoxComplete } from '../utils/sudoku-grid.utils';
+import { getCandidateNumbers, getCellConflicts, getCellLocation, getRelatedIndices as getRelatedIndicesForCell, isBoardSolved, isBoxComplete, isRowComplete, isColComplete } from '../utils/sudoku-grid.utils';
 
 export type { Difficulty, SudokuCell, GameStats, HintDetails, GameStatus } from '../models/game-state';
 
@@ -561,5 +561,13 @@ export class SudokuService {
 
   isBoxComplete(boxIndex: number): boolean {
     return isBoxComplete(this.board(), boxIndex);
+  }
+
+  isRowComplete(rowIndex: number): boolean {
+    return isRowComplete(this.board(), rowIndex);
+  }
+
+  isColComplete(colIndex: number): boolean {
+    return isColComplete(this.board(), colIndex);
   }
 }
