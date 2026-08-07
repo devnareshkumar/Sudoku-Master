@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { AnalyticsService } from './services/analytics.service';
 import { SudokuService } from './services/sudoku.service';
 import type { Difficulty } from './models/game-state';
+import { Router, NavigationEnd, RouterOutlet, RouterModule } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 import { 
   LucideAngularModule, 
   Brain, 
@@ -37,7 +40,9 @@ import { AdBannerComponent } from './ad-banner.component';
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
+    RouterModule, 
+    RouterOutlet,
     LucideAngularModule,
     StatsPanelComponent,
     ToolbarComponent,
@@ -82,6 +87,16 @@ export class App {
   readonly isNumberComplete = (value: number): boolean => this.sudokuService.isNumberComplete(value);
 
   showSettings = signal(false);
+
+  private router = inject(Router);
+  
+  readonly currentRoute = toSignal(
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      map((event) => (event as NavigationEnd).urlAfterRedirects)
+    ),
+    { initialValue: this.router.url }
+  );
 
   constructor() {
     this.analytics.trackAppLaunch();

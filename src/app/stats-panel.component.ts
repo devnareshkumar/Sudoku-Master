@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Pause, RotateCcw, ChevronDown, Trophy } from 'lucide-angular';
+import { RouterModule } from '@angular/router';
+import { LucideAngularModule, Pause, RotateCcw, ChevronDown, Trophy, Info } from 'lucide-angular';
 import type { Difficulty } from './models/game-state';
 
 @Component({
   selector: 'app-stats-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, RouterModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'contents' },
   styles: [`
@@ -29,78 +30,69 @@ import type { Difficulty } from './models/game-state';
     }
   `],
   template: `
-    <!-- RESTORED: Classic Header Row -->
-    <div class="flex items-center justify-between w-full px-1 mb-5 relative">
-      <h1 class="text-2xl font-bold tracking-tight text-app-ink">SudokuStudio</h1>
+    <!-- Header Row -->
+    <div class="flex items-center justify-between mb-4 sm:mb-6">
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-app-ink tracking-tight">SudokuStudio</h1>
       
-      <!-- Restored Custom Dropdown Wrapper -->
-      <div>
-          <button class="new-game-btn bg-app-accent text-app-surface px-4 py-1.5 rounded-full text-sm font-bold tracking-wider cursor-pointer z-50 relative"
-                  (click)="difficultyMenuOpen = !difficultyMenuOpen">
-            NEW GAME
-          </button>
-
-          <!-- Invisible backdrop to close the menu when clicking outside -->
-          @if (difficultyMenuOpen) {
-            <div class="fixed inset-0 z-40" (click)="difficultyMenuOpen = false"></div>
-          }
-
-          <!-- Custom Difficulty Menu -->
-          @if (difficultyMenuOpen) {
-            <div class="absolute right-1 top-10 mt-1 w-36 bg-app-surface border border-app-line rounded-xl shadow-lg z-50 py-1 overflow-hidden flex flex-col">
-              @for (d of difficulties; track d) {
-                <button class="px-4 py-2 text-left text-sm font-semibold capitalize hover:bg-app-line/30 transition-colors text-app-ink cursor-pointer"
-                        (click)="selectDifficulty(d)">
-                  {{ d }}
-                </button>
-              }
-            </div>
-          }
+      <!-- App-Level Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a routerLink="/how-to-play" 
+           class="flex items-center justify-center p-2 text-app-ink/60 hover:text-app-accent hover:bg-app-highlight transition-all rounded-full cursor-pointer" 
+           title="How to Play & Rules" 
+           aria-label="How to Play & Rules">
+          <lucide-icon [img]="Info" class="w-6 h-6"></lucide-icon>
+        </a>
+        <button (click)="newGame.emit()" class="new-game-btn bg-app-accent hover:opacity-90 text-white font-bold py-2 sm:py-2.5 px-4 sm:px-6 rounded-full shadow-sm text-sm sm:text-base">
+          NEW GAME
+        </button>
       </div>
     </div>
 
-    <!-- RESTORED: Classic Stats Row (with Score seamlessly integrated) -->
-    <div class="flex items-end justify-between w-full px-2 mb-2">
+    <!-- Stats Row -->
+    <div class="flex items-center justify-between text-app-ink/80 text-xs sm:text-sm font-medium px-1">
       
-      <!-- Difficulty -->
-      <div class="flex flex-col gap-1">
-        <span class="text-[10px] font-bold text-app-ink/50 tracking-wider uppercase">Difficulty</span>
-        <div class="relative ios-dropdown -ml-1">
-          <select class="appearance-none bg-transparent pl-1 pr-6 py-0.5 text-app-ink font-semibold focus:outline-none cursor-pointer capitalize"
-                  [value]="difficulty"
-                  (change)="onDifficultyChange($event)">
-              @for (d of difficulties; track d) {
-                  <option [value]="d">{{ d }}</option>
-              }
+      <!-- Difficulty Selector -->
+      <div class="flex flex-col gap-0.5">
+        <span class="text-[0.65rem] sm:text-xs font-bold tracking-wider text-app-ink/40 uppercase">DIFFICULTY</span>
+        <div class="relative ios-dropdown">
+          <select 
+            [value]="difficulty" 
+            (change)="onDifficultyChange($event)"
+            class="appearance-none bg-transparent font-bold text-app-ink text-sm sm:text-base pr-5 outline-none cursor-pointer focus:ring-0">
+            @for (d of difficulties; track d) {
+              <option [value]="d" class="capitalize">{{ d }}</option>
+            }
           </select>
-          <lucide-icon [img]="ChevronDown" class="absolute right-1 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-app-ink opacity-40 pointer-events-none"></lucide-icon>
+          <lucide-icon [img]="ChevronDown" class="w-3.5 h-3.5 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-app-ink/40"></lucide-icon>
         </div>
       </div>
 
       <!-- Mistakes -->
-      <div class="flex flex-col gap-1 items-center">
-        <span class="text-[10px] font-bold text-app-ink/50 tracking-wider uppercase">Mistakes</span>
-        <span class="font-semibold text-app-ink" [class.text-app-error]="mistakes > 0">{{ mistakes }}/3</span>
+      <div class="flex flex-col gap-0.5 items-center">
+        <span class="text-[0.65rem] sm:text-xs font-bold tracking-wider text-app-ink/40 uppercase">MISTAKES</span>
+        <span class="font-bold text-app-ink text-sm sm:text-base">{{ mistakes }}/3</span>
       </div>
 
-      <!-- NEW: Score -->
-      <div class="flex flex-col gap-1 items-center">
-        <span class="text-[10px] font-bold text-app-ink/50 tracking-wider uppercase">Score</span>
-        <div class="flex items-center gap-1 font-semibold text-app-accent">
-          <lucide-icon [img]="Trophy" class="w-3.5 h-3.5"></lucide-icon>
-          <span>{{ score }}</span>
+      <!-- Score & Active Game Controls -->
+      <div class="flex flex-col gap-0.5 items-end">
+        <span class="text-[0.65rem] sm:text-xs font-bold tracking-wider text-app-ink/40 uppercase pr-1">SCORE</span>
+        <div class="flex items-center gap-3 sm:gap-4">
+          <div class="flex items-center gap-1.5 text-app-accent font-bold">
+            <lucide-icon [img]="Trophy" class="w-4 h-4"></lucide-icon>
+            {{ score }}
+          </div>
+          
+          <!-- In-Game Controls -->
+          <div class="flex items-center gap-1">
+            <button (click)="resetGame.emit()" class="flex items-center justify-center p-1.5 text-app-ink/60 hover:text-app-ink transition-colors" title="Reset Game" aria-label="Reset Game">
+              <lucide-icon [img]="RotateCcw" class="w-[1.15rem] h-[1.15rem]"></lucide-icon>
+            </button>
+            <button (click)="pauseGame.emit()" class="flex items-center justify-center p-1.5 text-app-ink/60 hover:text-app-ink transition-colors" title="Pause Game" aria-label="Pause Game">
+              <lucide-icon [img]="Pause" class="w-[1.15rem] h-[1.15rem]"></lucide-icon>
+            </button>
+            <span class="font-mono text-app-ink font-bold ml-1 text-sm sm:text-base w-12 text-right">{{ formatTime(timerSeconds) }}</span>
+          </div>
         </div>
-      </div>
-
-      <!-- Controls & Timer -->
-      <div class="flex items-center gap-3 text-app-ink pb-0.5">
-        <button class="opacity-50 hover:opacity-100 transition-opacity cursor-pointer" (click)="resetGame.emit()">
-          <lucide-icon [img]="RotateCcw" class="w-4 h-4"></lucide-icon>
-        </button>
-        <button class="opacity-50 hover:opacity-100 transition-opacity cursor-pointer" (click)="pauseGame.emit()">
-          <lucide-icon [img]="Pause" class="w-4 h-4"></lucide-icon>
-        </button>
-        <span class="font-mono font-medium text-lg w-[45px] text-right">{{ formatTime(timerSeconds) }}</span>
       </div>
 
     </div>
@@ -113,7 +105,7 @@ export class StatsPanelComponent {
   @Input() difficulty: Difficulty = 'easy';
 
   @Output() pauseGame = new EventEmitter<void>();
-  @Output() newGame = new EventEmitter<void>(); 
+  @Output() newGame = new EventEmitter<void>();
   @Output() resetGame = new EventEmitter<void>();
   @Output() difficultyChange = new EventEmitter<Difficulty>();
 
@@ -121,17 +113,16 @@ export class StatsPanelComponent {
   readonly RotateCcw = RotateCcw;
   readonly ChevronDown = ChevronDown;
   readonly Trophy = Trophy;
+  readonly Info = Info;
 
   readonly difficulties: Difficulty[] = ['easy', 'medium', 'hard', 'expert'];
-
-  // --- RESTORED: Custom Dropdown State ---
+  
   difficultyMenuOpen = false;
 
   selectDifficulty(diff: Difficulty) {
     this.difficultyMenuOpen = false;
     this.difficultyChange.emit(diff);
   }
-  // ---------------------------------------
 
   formatTime(seconds: number): string {
     const mins = Math.floor(seconds / 60);
@@ -142,6 +133,7 @@ export class StatsPanelComponent {
   onDifficultyChange(event: Event) {
     const select = event.target as HTMLSelectElement;
     this.difficultyChange.emit(select.value as Difficulty);
+    // Reset the select value back to the input property so it behaves as a controlled component
     select.value = this.difficulty;
   }
 }

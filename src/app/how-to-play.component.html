@@ -1,0 +1,116 @@
+<main class="min-h-screen bg-app-bg transition-colors duration-300 py-10">
+  <article class="mx-auto max-w-4xl bg-app-surface rounded-2xl shadow-sm border border-app-line p-6 sm:p-10 transition-colors duration-300">
+    <a routerLink="/" class="inline-flex items-center gap-2 text-app-accent hover:opacity-80 font-medium mb-8 cursor-pointer transition-opacity">
+        <lucide-icon [img]="ArrowLeft" class="w-5 h-5"></lucide-icon>
+        Back to Game
+    </a>
+    <header class="mb-12 text-center sm:text-left">
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-app-ink tracking-tight mb-4">
+        How to Play Sudoku: Rules & Strategies
+      </h1>
+      <p class="text-lg text-app-ink/80 leading-relaxed max-w-2xl">
+        Whether you are a complete beginner or looking to sharpen your logic skills, this guide will walk you through the essential rules, basic techniques, and frequently asked questions about Sudoku Studio.
+      </p>
+    </header>
+
+    <!-- SECTION: The Basic Rules -->
+    <section class="mb-12">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-app-highlight rounded-lg text-app-accent">
+          <lucide-icon [img]="BookOpen" class="w-6 h-6"></lucide-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-app-ink">The Basic Rules</h2>
+      </div>
+      
+      <p class="text-base text-app-ink/80 leading-relaxed mb-4">
+        Sudoku is a logic-based number placement puzzle. The objective is to fill a 9×9 grid with digits so that each column, each row, and each of the nine 3×3 subgrids (also called "boxes" or "regions") contain all of the digits from 1 to 9. 
+      </p>
+      
+      <ul class="space-y-4 mt-6">
+        <li class="flex items-start gap-3">
+          <lucide-icon [img]="CheckCircle2" class="w-5 h-5 text-app-success flex-shrink-0 mt-0.5"></lucide-icon>
+          <span class="text-app-ink/80 leading-relaxed"><strong>Rule 1:</strong> Every row must contain the numbers 1 through 9 exactly once.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <lucide-icon [img]="CheckCircle2" class="w-5 h-5 text-app-success flex-shrink-0 mt-0.5"></lucide-icon>
+          <span class="text-app-ink/80 leading-relaxed"><strong>Rule 2:</strong> Every column must contain the numbers 1 through 9 exactly once.</span>
+        </li>
+        <li class="flex items-start gap-3">
+          <lucide-icon [img]="CheckCircle2" class="w-5 h-5 text-app-success flex-shrink-0 mt-0.5"></lucide-icon>
+          <span class="text-app-ink/80 leading-relaxed"><strong>Rule 3:</strong> Every 3×3 box must contain the numbers 1 through 9 exactly once.</span>
+        </li>
+      </ul>
+    </section>
+
+    <hr class="border-t border-app-line my-10">
+
+    <!-- SECTION: Strategies & Tips -->
+    <section class="mb-12">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-app-highlight rounded-lg text-app-accent">
+          <lucide-icon [img]="Lightbulb" class="w-6 h-6"></lucide-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-app-ink">Winning Strategies</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-app-bg border border-app-line rounded-xl p-6">
+          <h3 class="text-lg font-bold text-app-accent mb-2">Scanning / Crosshatching</h3>
+          <p class="text-sm text-app-ink/80 leading-relaxed">
+            This is the easiest technique for beginners. Focus on a single number (e.g., 5) and scan all the rows and columns to see where a 5 is already placed. Use those existing 5s to eliminate empty squares in a specific 3x3 box until only one valid square remains.
+          </p>
+        </div>
+        
+        <div class="bg-app-bg border border-app-line rounded-xl p-6">
+          <h3 class="text-lg font-bold text-app-accent mb-2">Naked Singles</h3>
+          <p class="text-sm text-app-ink/80 leading-relaxed">
+            Sometimes, a specific cell can only possibly hold one number because the other eight numbers are already present in its sharing row, column, and 3x3 box. Whenever you spot a cell restricted to a single digit, fill it in immediately!
+          </p>
+        </div>
+
+        <div class="bg-app-bg border border-app-line rounded-xl p-6 md:col-span-2">
+          <h3 class="text-lg font-bold text-app-accent mb-2">Using Note Mode (Pencil Marks)</h3>
+          <p class="text-sm text-app-ink/80 leading-relaxed">
+            As you progress to Medium and Hard difficulties in Sudoku Studio, keeping track of possibilities becomes essential. Tap the "Pencil" icon to toggle Note Mode. This allows you to write tiny candidate numbers inside empty cells. If you determine a cell can only be a 3 or an 8, mark both down. As you solve other parts of the grid, you will systematically eliminate these pencil marks until the solution reveals itself.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <hr class="border-t border-app-line my-10">
+
+    <!-- SECTION: FAQ -->
+    <section>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 bg-app-highlight rounded-lg text-app-accent">
+          <lucide-icon [img]="HelpCircle" class="w-6 h-6"></lucide-icon>
+        </div>
+        <h2 class="text-2xl font-bold text-app-ink">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <h4 class="text-base font-bold text-app-ink mb-1">Do I need to be good at math to play Sudoku?</h4>
+          <p class="text-sm text-app-ink/80 leading-relaxed">
+            Not at all! Despite using numbers, Sudoku requires absolutely no arithmetic or math skills. The numbers merely act as distinct symbols. You could replace the numbers 1-9 with letters, shapes, or colors, and the logic of the game would remain exactly the same.
+          </p>
+        </div>
+        
+        <div>
+          <h4 class="text-base font-bold text-app-ink mb-1">Should I ever guess a number?</h4>
+          <p class="text-sm text-app-ink/80 leading-relaxed">
+            No, guessing is highly discouraged. Sudoku is a game of pure deduction. Every properly designed Sudoku puzzle has one unique solution that can be reached entirely through logical steps. If you guess wrong, you will eventually cause an unfixable error later in the game.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-base font-bold text-app-ink mb-1">What happens if I make a mistake in Sudoku Studio?</h4>
+          <p class="text-sm text-app-ink/80 leading-relaxed">
+            Sudoku Studio tracks incorrect placements. If you place a number in a cell that violates the puzzle's final solution, it will be marked as an error in red. Accumulating 3 mistakes will result in a Game Over, encouraging careful, thoughtful play.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </article>
+</main>

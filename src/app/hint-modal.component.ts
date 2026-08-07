@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router'; // <-- Add this
 import { LucideAngularModule, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-angular';
 import type { HintDetails } from './models/game-state';
 
@@ -11,83 +12,76 @@ import type { HintDetails } from './models/game-state';
   host: { class: 'contents' },
   template: `
     @if (visible && hint) {
-      <div class="absolute -right-4 top-10 w-80 bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)] p-8 z-50 animate-in fade-in zoom-in duration-300 border border-slate-50">
-        <div class="min-h-[140px] flex flex-col">
-          <h3 class="text-slate-800 font-black text-xl mb-2">
-            @switch (step) {
-              @case (0) { Last Remaining Cell }
-              @case (1) { Analysis }
-              @case (2) { Solution Found }
-            }
-          </h3>
-
-          <div class="flex-1">
+      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" (click)="prevStep.emit()"></div>
+        
+        <!-- Modal Container using theme surface and line colors -->
+        <div class="bg-app-surface rounded-2xl shadow-xl border border-app-line w-full max-w-sm p-6 transform transition-all relative">
+          
+          <div class="mb-6">
+            <!-- Modal Title -->
+            <h3 class="text-xl font-bold text-app-ink mb-2">
+              @switch (step) {
+                @case (0) { Last Remaining Cell }
+                @case (1) { Analysis }
+                @case (2) { Solution Found }
+              }
+            </h3>
+            
             @switch (step) {
               @case (0) {
-                <p class="text-slate-500 text-sm leading-relaxed">
-                  Pay attention to <span class="text-blue-600 font-bold">this cell</span> and the highlighted areas around it.
+                <!-- Modal Body Text -->
+                <p class="text-app-ink/80 text-base leading-relaxed">
+                  Pay attention to <span class="font-bold text-app-accent">this cell</span> and the highlighted areas around it.
                 </p>
               }
               @case (1) {
-                <p class="text-slate-500 text-sm leading-relaxed">
-                  {{ hint.reason }}
-                </p>
-              }
-              @case (2) {
-                <div class="flex flex-col items-center gap-3 py-2">
-                  <h4 class="text-blue-600 font-bold text-sm uppercase tracking-widest">Ready to Solve</h4>
-                  <p class="text-slate-500 text-sm text-center">
-                    Click <span class="font-bold text-slate-800">Accept</span> to reveal the solution and fill this cell.
-                  </p>
-                  <div class="w-14 h-14 bg-slate-50 text-slate-300 rounded-2xl flex items-center justify-center text-3xl font-black border-2 border-dashed border-slate-200">
-                    ?
-                  </div>
+                <!-- Highlight Box -->
+                <div class="bg-app-highlight rounded-xl p-4 mb-6 border border-app-line">
+                  <p class="text-sm text-app-ink leading-relaxed">{{ hint.reason }}</p>
                 </div>
               }
-            }
-          </div>
-        </div>
-
-        <div class="mt-8 flex items-center justify-between">
-          <div class="flex gap-2">
-            @for (stepIndex of [0, 1, 2]; track stepIndex) {
-              <div
-                class="w-2 h-2 rounded-full transition-all duration-300"
-                [class.bg-blue-600]="step === stepIndex"
-                [class.w-5]="step === stepIndex"
-                [class.bg-slate-200]="step !== stepIndex"
-              ></div>
+              @case (2) {
+                <p class="text-app-ink/80 text-base leading-relaxed mb-6">
+                  <span class="font-bold text-app-ink">Ready to Solve?</span><br>Click Accept to reveal the solution and fill this cell.
+                </p>
+              }
             }
           </div>
 
-          <div class="flex gap-2 items-center">
-            @if (step === 2) {
-              <button
-                (click)="confirm.emit()"
-                class="px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold text-sm shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all flex items-center gap-2 group"
-              >
-                <lucide-icon [name]="CheckCircle2" size="18" class="group-hover:scale-110 transition-transform"></lucide-icon>
-                Accept
-              </button>
-            } @else {
-              @if (step > 0) {
-                <button
-                  (click)="prevStep.emit()"
-                  class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-slate-200 hover:text-slate-600 transition-all group"
-                  aria-label="Previous step"
-                >
-                  <lucide-icon [name]="ArrowLeft" size="18" class="group-hover:-translate-x-0.5 transition-transform"></lucide-icon>
+          <div class="flex items-center justify-between">
+            <!-- Dots Indicator -->
+            <div class="flex gap-1.5 items-center">
+              @for (stepIndex of [0, 1, 2]; track stepIndex) {
+                <div class="rounded-full transition-all duration-300"
+                     [class]="step === stepIndex ? 'w-6 h-2 bg-app-accent' : 'w-2 h-2 bg-app-line'">
+                </div>
+              }
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-2">
+              @if (step === 2) {
+                <!-- Accept Button -->
+                <button (click)="confirm.emit()" 
+                        class="flex-1 bg-app-accent hover:opacity-90 text-white font-bold py-3.5 px-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2">
+                  <lucide-icon [img]="CheckCircle2" class="w-5 h-5"></lucide-icon>
+                  Accept
+                </button>
+              } @else {
+                @if (step > 0) {
+                  <!-- Previous Button -->
+                  <button (click)="prevStep.emit()" class="p-2 text-app-ink/50 hover:text-app-ink transition-colors">
+                    <lucide-icon [img]="ArrowLeft" class="w-5 h-5"></lucide-icon>
+                  </button>
+                }
+                <!-- Next Button -->
+                <button (click)="nextStep.emit()" 
+                        class="p-2.5 bg-app-highlight text-app-accent hover:opacity-80 rounded-full transition-colors">
+                  <lucide-icon [img]="ArrowRight" class="w-5 h-5"></lucide-icon>
                 </button>
               }
-
-              <button
-                (click)="nextStep.emit()"
-                class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all shadow-sm group"
-                aria-label="Next step"
-              >
-                <lucide-icon [name]="ArrowRight" size="18" class="group-hover:translate-x-0.5 transition-transform"></lucide-icon>
-              </button>
-            }
+            </div>
           </div>
         </div>
       </div>
@@ -98,6 +92,7 @@ export class HintModalComponent {
   @Input() visible = false;
   @Input() hint: HintDetails | null = null;
   @Input() step = 0;
+
   @Output() nextStep = new EventEmitter<void>();
   @Output() prevStep = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<void>();
