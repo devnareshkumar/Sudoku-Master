@@ -536,6 +536,26 @@ export class SudokuService {
   closeAdPrompt() {
     this.adService.closeAdPrompt();
   }
+  
+  watchSecondChanceAd() {
+    // 1. Set your ad playing state (if you have a loading spinner overlay)
+    // this.isWatchingAd.set(true); 
+
+    // 2. Simulate the ad video (or call this.adService.showRewardedAd())
+    setTimeout(() => {
+      // this.isWatchingAd.set(false);
+      
+      // 3. Give them back 1 life (3 goes back to 2)
+      this.mistakes.update(m => Math.max(0, m - 1));
+      
+      // 4. Change the game status back to active
+      this.gameStatus.set('playing');
+      
+      // 5. CRITICAL: Automatically undo the wrong number they just placed
+      this.undo(); 
+      
+    }, 10000); // 10-second simulated ad
+  }
 
   private applyPersistedGameState(state: PersistedGameState) {
     const restoredBoard = this.board().map((cell, index) => {
